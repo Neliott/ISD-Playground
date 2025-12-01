@@ -18,6 +18,10 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  resolveTies: {
+    type: Boolean,
+    default: true
+  },
   prototypes: {
     type: Array,
     default: () => []
@@ -57,6 +61,7 @@ precision highp float;
 uniform vec2 u_resolution;
 uniform int u_k;
 uniform int u_numPoints;
+uniform bool u_resolveTies;
 uniform sampler2D u_pointsTexture; // (x, y, classId, 0)
 
 uniform vec3 u_classColors[${MAX_CLASSES}];
@@ -144,22 +149,49 @@ void main() {
 
   // Find winner
   int maxCount = -1;
-  int winnerIndex = -1;
-  bool tie = false;
-
+  
   for(int i = 0; i < ${MAX_CLASSES}; i++) {
     if (i >= u_numClasses) break;
     if (counts[i] > maxCount) {
       maxCount = counts[i];
+    }
+  }
+
+  int winnerIndex = -1;
+  int tieCount = 0;
+
+  for(int i = 0; i < ${MAX_CLASSES}; i++) {
+    if (i >= u_numClasses) break;
+    if (counts[i] == maxCount) {
       winnerIndex = i;
-      tie = false;
-    } else if (counts[i] == maxCount) {
-      tie = true;
+      tieCount++;
+    }
+  }
+
+  if (tieCount > 1) {
+    if (u_resolveTies) {
+      for(int i = 0; i < effectiveK; i++) {
+        int cId = neighbors[i].classId;
+        int cIndex = -1;
+        for(int j = 0; j < ${MAX_CLASSES}; j++) {
+          if (j >= u_numClasses) break;
+          if (u_classIds[j] == cId) {
+            cIndex = j;
+            break;
+          }
+        }
+        if (cIndex != -1 && counts[cIndex] == maxCount) {
+          winnerIndex = cIndex;
+          break;
+        }
+      }
+    } else {
+      winnerIndex = -1;
     }
   }
 
   vec3 color = vec3(0.07); // Background
-  if (!tie && winnerIndex != -1) {
+  if (winnerIndex != -1) {
     color = u_classColors[winnerIndex] * 0.5; // Dimmed color
   }
 
@@ -247,6 +279,7 @@ function updateWebGL() {
   
   gl.uniform1i(gl.getUniformLocation(program, 'u_k'), kValue)
   gl.uniform1i(gl.getUniformLocation(program, 'u_numPoints'), activePoints.length)
+  gl.uniform1i(gl.getUniformLocation(program, 'u_resolveTies'), props.resolveTies ? 1 : 0)
   
   // Update Points Texture
   if (activePoints.length > 0) {
@@ -381,7 +414,7 @@ onUnmounted(() => {
   }
 })
 
-watch(() => [props.points, props.k, props.classes, props.showLvq, props.prototypes], () => {
+watch(() => [props.points, props.k, props.classes, props.showLvq, props.prototypes, props.resolveTies], () => {
   requestAnimationFrame(() => {
     updateWebGL()
     drawUI()

@@ -8,6 +8,7 @@ const selectedClass = ref(1)
 const points = ref([])
 const prototypes = ref([])
 const showLvq = ref(false)
+const resolveTies = ref(true)
 
 const classes = [
   { id: 1, name: 'Red', color: '#ff4444' },
@@ -100,6 +101,7 @@ function trainLvq() {
         :points="points"
         :prototypes="prototypes"
         :show-lvq="showLvq"
+        :resolve-ties="resolveTies"
         :k="k"
         :classes="classes"
         @add-point="addPoint"
@@ -111,6 +113,7 @@ function trainLvq() {
         v-model:k="k"
         v-model:selectedClass="selectedClass"
         v-model:showLvq="showLvq"
+        v-model:resolveTies="resolveTies"
         :prototypes="prototypes"
         :classes="classes"
         @clear="clearPoints"

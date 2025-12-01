@@ -19,10 +19,14 @@ defineProps({
   prototypes: {
     type: Array,
     required: true
+  },
+  resolveTies: {
+    type: Boolean,
+    default: true
   }
 })
 
-defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'clear', 'init-lvq', 'train-lvq'])
+defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'update:resolveTies', 'clear', 'init-lvq', 'train-lvq'])
 </script>
 
 <template>
@@ -64,6 +68,16 @@ defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'clear', 'ini
           :value="k"
           @input="$emit('update:k', Number($event.target.value))"
         >
+      </div>
+      <div class="checkbox-row">
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            :checked="resolveTies"
+            @change="$emit('update:resolveTies', $event.target.checked)"
+          >
+          Resolve ties with closest
+        </label>
       </div>
     </div>
 
@@ -308,5 +322,28 @@ h3 {
 .action-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.checkbox-row {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #4464ff;
+  cursor: pointer;
 }
 </style>
