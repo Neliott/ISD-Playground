@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
-import Controls from '../components/Controls.vue'
-import KnnCanvas from '../components/KnnCanvas.vue'
+import Controls from './Controls.vue'
+import KnnCanvas from './KnnCanvas.vue'
 
 const k = ref(3)
 const selectedClass = ref(1)
@@ -156,6 +156,7 @@ function trainLvq() {
   text-align: right;
   pointer-events: none;
   text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  z-index: 20;
 }
 
 .info-overlay h1 {

@@ -5,12 +5,20 @@ import { RouterView } from 'vue-router'
 <template>
   <RouterView v-slot="{ Component }">
     <transition name="fade" mode="out-in">
-      <component :is="Component" />
+      <div class="view-wrapper">
+        <component :is="Component" />
+      </div>
     </transition>
   </RouterView>
 </template>
 
 <style>
+.view-wrapper {
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+}
+
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
