@@ -95,8 +95,8 @@ function trainLvq() {
 </script>
 
 <template>
-  <div class="app-container">
-    <div class="main">
+  <div class="relative w-full h-full overflow-hidden bg-background">
+    <div class="absolute inset-0 z-0">
       <KnnCanvas
         :points="points"
         :prototypes="prototypes"
@@ -108,84 +108,33 @@ function trainLvq() {
       />
     </div>
     
-    <div class="sidebar-overlay">
-      <Controls
-        v-model:k="k"
-        v-model:selectedClass="selectedClass"
-        v-model:showLvq="showLvq"
-        v-model:resolveTies="resolveTies"
-        :prototypes="prototypes"
-        :classes="classes"
-        @clear="clearPoints"
-        @init-lvq="initLvq"
-        @train-lvq="trainLvq"
-      />
+    <!-- Controls Container -->
+    <div class="absolute top-4 left-4 bottom-4 w-80 z-10 flex flex-col pointer-events-none">
+      <div class="pointer-events-auto h-full">
+        <Controls
+          v-model:k="k"
+          v-model:selectedClass="selectedClass"
+          v-model:showLvq="showLvq"
+          v-model:resolveTies="resolveTies"
+          :prototypes="prototypes"
+          :classes="classes"
+          @clear="clearPoints"
+          @init-lvq="initLvq"
+          @train-lvq="trainLvq"
+        />
+      </div>
     </div>
 
-    <div class="info-overlay">
-      <h1>kNN Visualization</h1>
-      <p>Double-click to add points</p>
-      <router-link to="/" class="back-link">← Back to Home</router-link>
+    <!-- Info Overlay -->
+    <div class="absolute top-6 right-6 z-20 text-right pointer-events-none select-none">
+      <h1 class="text-2xl font-bold text-white/90 tracking-tight">kNN Visualization</h1>
+      <p class="mt-1 text-sm text-white/60 font-light">Double-click to add points</p>
+      <router-link 
+        to="/" 
+        class="inline-block mt-3 text-sm text-white/70 hover:text-white transition-colors pointer-events-auto"
+      >
+        ← Back to Home
+      </router-link>
     </div>
   </div>
 </template>
-
-<style scoped>
-.app-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-.main {
-  width: 100%;
-  height: 100%;
-}
-
-.sidebar-overlay {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  bottom: 20px;
-  width: 300px;
-  z-index: 10;
-}
-
-.info-overlay {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  text-align: right;
-  pointer-events: none;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-  z-index: 20;
-}
-
-.info-overlay h1 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.info-overlay p {
-  margin: 5px 0 0;
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.back-link {
-  display: inline-block;
-  margin-top: 10px;
-  color: rgba(255, 255, 255, 0.8);
-  text-decoration: none;
-  pointer-events: auto;
-  font-size: 0.9rem;
-  transition: color 0.2s;
-}
-
-.back-link:hover {
-  color: white;
-}
-</style>

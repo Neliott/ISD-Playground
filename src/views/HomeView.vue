@@ -31,235 +31,66 @@ function handleMouseMove(e) {
 </script>
 
 <template>
-  <div class="home-container">
-    <div class="background-gradient"></div>
+  <div class="min-h-screen flex flex-col relative overflow-hidden bg-background text-white font-sans selection:bg-primary/30">
+    <!-- Background Gradients -->
+    <div class="absolute inset-0 z-0 pointer-events-none">
+      <div class="absolute top-[15%] left-[15%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px]"></div>
+      <div class="absolute bottom-[30%] right-[15%] w-[500px] h-[500px] bg-accent/10 rounded-full blur-[120px]"></div>
+    </div>
     
-    <header class="hero">
-      <div class="hero-content">
-        <h1 class="title">AI <span class="gradient-text">Playground</span></h1>
-        <p class="subtitle">Interactive experiments in Artificial Intelligence & Machine Learning</p>
+    <header class="pt-32 pb-20 px-5 text-center relative z-10">
+      <div class="max-w-4xl mx-auto">
+        <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight leading-tight mb-6">
+          AI <span class="bg-clip-text text-transparent bg-gradient-to-br from-white to-primary-300">Playground</span>
+        </h1>
+        <p class="text-xl text-white/60 font-light max-w-2xl mx-auto leading-relaxed">
+          Interactive experiments in Artificial Intelligence & Machine Learning designed for the future of education.
+        </p>
       </div>
     </header>
 
-    <main class="grid-container">
+    <main class="flex-1 max-w-7xl mx-auto px-6 md:px-10 w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative z-10 pb-20">
       <div 
         v-for="exp in experiences" 
         :key="exp.id" 
-        class="card"
+        class="group relative bg-white/5 border border-white/10 rounded-3xl cursor-pointer transition-all duration-300 hover:-translate-y-2 hover:border-white/20 overflow-hidden"
         @click="navigateTo(exp.route)"
         @mousemove="handleMouseMove"
         :style="{ '--accent-color': exp.color }"
       >
-        <div class="card-glow"></div>
-        <div class="card-content">
-          <div class="card-header">
-            <span class="icon">{{ exp.icon }}</span>
-            <span class="arrow">→</span>
+        <!-- Glow Effect -->
+        <div 
+          class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+          style="background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.06), transparent 40%);"
+        ></div>
+
+        <div class="relative z-10 h-full p-8 flex flex-col bg-surface/50 backdrop-blur-sm">
+          <div class="flex justify-between items-start mb-auto">
+            <span class="text-4xl bg-white/5 w-16 h-16 flex items-center justify-center rounded-2xl shadow-inner border border-white/5">
+              {{ exp.icon }}
+            </span>
+            <span class="text-2xl text-[var(--accent-color)] opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+              →
+            </span>
           </div>
-          <div class="card-body">
-            <h3>{{ exp.subtitle }}</h3>
-            <h2>{{ exp.title }}</h2>
-            <p>{{ exp.description }}</p>
+          
+          <div class="mt-8">
+            <h3 class="text-xs font-bold uppercase tracking-widest text-[var(--accent-color)] mb-2">
+              {{ exp.subtitle }}
+            </h3>
+            <h2 class="text-2xl font-bold text-white mb-4 group-hover:text-primary-200 transition-colors">
+              {{ exp.title }}
+            </h2>
+            <p class="text-base text-white/60 leading-relaxed font-light">
+              {{ exp.description }}
+            </p>
           </div>
         </div>
       </div>
     </main>
 
-    <footer class="footer">
+    <footer class="py-10 text-center text-white/30 text-sm relative z-10 border-t border-white/5">
       <p>Designed for the future of AI education.</p>
     </footer>
   </div>
 </template>
-
-<style scoped>
-.home-container {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  overflow: hidden;
-  background-color: #050505;
-  color: #ffffff;
-  font-family: 'Inter', sans-serif;
-}
-
-.background-gradient {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: 
-    radial-gradient(circle at 15% 50%, rgba(68, 100, 255, 0.08), transparent 25%),
-    radial-gradient(circle at 85% 30%, rgba(255, 68, 255, 0.08), transparent 25%);
-  z-index: 0;
-  pointer-events: none;
-}
-
-.hero {
-  padding: 120px 20px 80px;
-  text-align: center;
-  position: relative;
-  z-index: 1;
-}
-
-.title {
-  font-size: 5rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  margin: 0;
-  line-height: 1.1;
-}
-
-.gradient-text {
-  background: linear-gradient(135deg, #fff 0%, #88aaff 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.subtitle {
-  font-size: 1.25rem;
-  color: rgba(255, 255, 255, 0.6);
-  margin-top: 24px;
-  font-weight: 400;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.grid-container {
-  flex: 1;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 40px;
-  width: 100%;
-  box-sizing: border-box;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-  gap: 32px;
-  position: relative;
-  z-index: 1;
-}
-
-.card {
-  position: relative;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
-  padding: 2px; /* For border gradient effect if needed */
-  cursor: pointer;
-  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-  overflow: hidden;
-  height: 320px;
-}
-
-.card:hover {
-  transform: translateY(-8px);
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.15);
-}
-
-.card-glow {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(
-    800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-    rgba(255, 255, 255, 0.06),
-    transparent 40%
-  );
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.card:hover .card-glow {
-  opacity: 1;
-}
-
-.card-content {
-  background: #0a0a0a;
-  height: 100%;
-  border-radius: 22px;
-  padding: 32px;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  z-index: 2;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: auto;
-}
-
-.icon {
-  font-size: 2.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  width: 64px;
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 16px;
-}
-
-.arrow {
-  font-size: 1.5rem;
-  color: var(--accent-color);
-  opacity: 0;
-  transform: translateX(-10px);
-  transition: all 0.3s ease;
-}
-
-.card:hover .arrow {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-.card-body h3 {
-  font-size: 0.875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--accent-color);
-  margin: 0 0 8px 0;
-  font-weight: 600;
-}
-
-.card-body h2 {
-  font-size: 2rem;
-  margin: 0 0 16px 0;
-  font-weight: 700;
-  color: white;
-}
-
-.card-body p {
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.6);
-  line-height: 1.6;
-  margin: 0;
-}
-
-.footer {
-  padding: 60px 20px;
-  text-align: center;
-  color: rgba(255, 255, 255, 0.3);
-  font-size: 0.9rem;
-  position: relative;
-  z-index: 1;
-}
-
-@media (max-width: 768px) {
-  .title {
-    font-size: 3rem;
-  }
-  
-  .grid-container {
-    padding: 0 20px;
-    grid-template-columns: 1fr;
-  }
-}
-</style>

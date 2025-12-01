@@ -327,6 +327,7 @@ function updateWebGL() {
 }
 
 function hexToRgb(hex) {
+  if (!hex) return [0, 0, 0]
   const r = parseInt(hex.slice(1, 3), 16) / 255
   const g = parseInt(hex.slice(3, 5), 16) / 255
   const b = parseInt(hex.slice(5, 7), 16) / 255
@@ -388,6 +389,7 @@ function handleDoubleClick(event) {
 let resizeObserver = null
 
 onMounted(() => {
+  console.log('KnnCanvas mounted')
   if (containerRef.value) {
     resizeObserver = new ResizeObserver(entries => {
       for (let entry of entries) {
@@ -401,11 +403,16 @@ onMounted(() => {
       }
     })
     resizeObserver.observe(containerRef.value)
+  } else {
+    console.error('Container ref not found')
   }
   
   initWebGL()
-  updateWebGL()
-  drawUI()
+  // Force initial update
+  requestAnimationFrame(() => {
+    updateWebGL()
+    drawUI()
+  })
 })
 
 onUnmounted(() => {
@@ -424,59 +431,22 @@ watch(() => [props.points, props.k, props.classes, props.showLvq, props.prototyp
 </script>
 
 <template>
-  <div ref="containerRef" class="canvas-container">
+  <div ref="containerRef" class="w-full h-full relative overflow-hidden bg-background">
     <canvas 
       ref="webglCanvasRef"
-      class="bg-canvas"
+      class="block absolute top-0 left-0 z-0"
       :width="width"
       :height="height"
     ></canvas>
     <canvas 
       ref="uiCanvasRef"
-      class="ui-canvas"
+      class="block absolute top-0 left-0 z-10 cursor-crosshair"
       :width="width"
       :height="height"
       @dblclick="handleDoubleClick"
     ></canvas>
-    <div v-if="points.length === 0" class="hint">
+    <div v-if="points.length === 0" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white/30 pointer-events-none text-xl font-light tracking-widest uppercase select-none">
       Double-click to add points
     </div>
   </div>
 </template>
-
-<style scoped>
-.canvas-container {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-  background: #000;
-}
-
-canvas {
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-.bg-canvas {
-  z-index: 0;
-}
-
-.ui-canvas {
-  z-index: 1;
-  cursor: crosshair;
-}
-
-.hint {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: rgba(255, 255, 255, 0.5);
-  pointer-events: none;
-  font-size: 1.2rem;
-  z-index: 2;
-}
-</style>

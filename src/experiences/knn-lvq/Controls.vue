@@ -30,22 +30,22 @@ defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'update:resol
 </script>
 
 <template>
-  <div class="controls-card">
-    <div class="control-group">
-      <div class="label-row">
-        <label>Mode</label>
-      </div>
-      <div class="mode-switch">
+  <div class="flex flex-col gap-6 p-6 bg-surface/60 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl h-full overflow-y-auto">
+    
+    <!-- Mode Switcher -->
+    <div class="flex flex-col gap-3">
+      <label class="text-xs font-medium text-white/50 uppercase tracking-wider">Mode</label>
+      <div class="flex p-1 bg-black/20 rounded-xl">
         <button 
-          class="mode-btn" 
-          :class="{ active: !showLvq }"
+          class="flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200"
+          :class="!showLvq ? 'bg-white/10 text-white shadow-lg' : 'text-white/40 hover:text-white/60'"
           @click="$emit('update:showLvq', false)"
         >
           kNN
         </button>
         <button 
-          class="mode-btn" 
-          :class="{ active: showLvq }"
+          class="flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200"
+          :class="showLvq ? 'bg-white/10 text-white shadow-lg' : 'text-white/40 hover:text-white/60'"
           @click="$emit('update:showLvq', true)"
         >
           LVQ
@@ -53,12 +53,14 @@ defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'update:resol
       </div>
     </div>
 
-    <div v-if="!showLvq" class="control-group">
-      <div class="label-row">
-        <label for="k-value">Neighbors (k)</label>
-        <span class="value-badge">{{ k }}</span>
+    <!-- kNN Controls -->
+    <div v-if="!showLvq" class="flex flex-col gap-4">
+      <div class="flex justify-between items-center">
+        <label for="k-value" class="text-sm font-medium text-white/80">Neighbors (k)</label>
+        <span class="px-2 py-1 bg-white/10 rounded-md text-xs font-bold text-white font-mono">{{ k }}</span>
       </div>
-      <div class="slider-container">
+      
+      <div class="relative h-6 flex items-center">
         <input 
           id="k-value"
           type="range" 
@@ -67,283 +69,83 @@ defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'update:resol
           step="1"
           :value="k"
           @input="$emit('update:k', Number($event.target.value))"
+          class="w-full h-1 bg-white/20 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110"
         >
       </div>
-      <div class="checkbox-row">
-        <label class="checkbox-label">
+
+      <label class="flex items-center gap-3 text-sm text-white/70 cursor-pointer group select-none">
+        <div class="relative flex items-center">
           <input 
             type="checkbox" 
             :checked="resolveTies"
             @change="$emit('update:resolveTies', $event.target.checked)"
+            class="peer sr-only"
           >
-          Resolve ties with closest
-        </label>
-      </div>
+          <div class="w-9 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+        </div>
+        <span class="group-hover:text-white transition-colors">Resolve ties</span>
+      </label>
     </div>
 
-    <div v-if="showLvq" class="control-group">
-      <div class="label-row">
-        <label>Prototypes</label>
-        <span class="value-badge">{{ prototypes.length }}</span>
+    <!-- LVQ Controls -->
+    <div v-if="showLvq" class="flex flex-col gap-4">
+      <div class="flex justify-between items-center">
+        <label class="text-sm font-medium text-white/80">Prototypes</label>
+        <span class="px-2 py-1 bg-white/10 rounded-md text-xs font-bold text-white font-mono">{{ prototypes.length }}</span>
       </div>
-      <div class="lvq-actions">
-        <button class="action-btn" @click="$emit('init-lvq')">
+      
+      <div class="grid grid-cols-2 gap-2">
+        <button 
+          class="py-2 px-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm font-medium text-white transition-colors"
+          @click="$emit('init-lvq')"
+        >
           Initialize
         </button>
-        <button class="action-btn primary" @click="$emit('train-lvq')" :disabled="prototypes.length === 0">
-          Train 1 Epoch
+        <button 
+          class="py-2 px-3 bg-primary/20 hover:bg-primary/30 border border-primary/40 rounded-xl text-sm font-medium text-primary-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          @click="$emit('train-lvq')" 
+          :disabled="prototypes.length === 0"
+        >
+          Train Epoch
         </button>
       </div>
     </div>
 
-    <div class="control-group">
-      <h3>Select Class</h3>
-      <div class="class-grid">
+    <!-- Class Selection -->
+    <div class="flex flex-col gap-3">
+      <h3 class="text-xs font-medium text-white/50 uppercase tracking-wider">Select Class</h3>
+      <div class="grid grid-cols-2 gap-2">
         <button
           v-for="cls in classes"
           :key="cls.id"
-          class="class-btn"
-          :class="{ active: selectedClass === cls.id }"
-          :style="{ '--btn-color': cls.color }"
+          class="group relative flex items-center gap-3 p-3 rounded-xl border transition-all duration-200"
+          :class="selectedClass === cls.id ? 'bg-white/10 border-white/30 shadow-lg' : 'bg-white/5 border-transparent hover:bg-white/10'"
           @click="$emit('update:selectedClass', cls.id)"
         >
-          <span class="color-dot" :style="{ backgroundColor: cls.color }"></span>
-          <span class="class-name">{{ cls.name }}</span>
+          <span 
+            class="w-3 h-3 rounded-full shadow-[0_0_8px_currentColor]"
+            :style="{ backgroundColor: cls.color, color: cls.color }"
+          ></span>
+          <span class="text-sm font-medium text-white/90">{{ cls.name }}</span>
+          
+          <!-- Active Indicator -->
+          <div 
+            v-if="selectedClass === cls.id"
+            class="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/20"
+          ></div>
         </button>
       </div>
     </div>
 
-    <button class="clear-btn" @click="$emit('clear')">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-      Clear Canvas
-    </button>
+    <!-- Clear Button -->
+    <div class="mt-auto pt-4 border-t border-white/10">
+      <button 
+        class="w-full flex items-center justify-center gap-2 py-3 px-4 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl text-sm font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-red-900/20"
+        @click="$emit('clear')"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        Clear Canvas
+      </button>
+    </div>
   </div>
 </template>
-
-<style scoped>
-.controls-card {
-  padding: 24px;
-  background: rgba(30, 30, 30, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 24px;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-}
-
-.control-group {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.label-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-label {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.value-badge {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-
-/* Custom Slider */
-input[type=range] {
-  -webkit-appearance: none;
-  width: 100%;
-  background: transparent;
-}
-
-input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  height: 20px;
-  width: 20px;
-  border-radius: 50%;
-  background: white;
-  cursor: pointer;
-  margin-top: -8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  transition: transform 0.1s;
-}
-
-input[type=range]::-webkit-slider-thumb:hover {
-  transform: scale(1.1);
-}
-
-input[type=range]::-webkit-slider-runnable-track {
-  width: 100%;
-  height: 4px;
-  cursor: pointer;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 2px;
-}
-
-h3 {
-  margin: 0;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.class-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-
-.class-btn {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  color: rgba(255, 255, 255, 0.8);
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: inherit;
-  font-size: 0.9rem;
-}
-
-.class-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-1px);
-}
-
-.class-btn.active {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: var(--btn-color);
-  color: white;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-.color-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  box-shadow: 0 0 8px var(--btn-color);
-}
-
-.clear-btn {
-  margin-top: auto;
-  padding: 14px;
-  background: rgba(255, 68, 68, 0.1);
-  color: #ff6666;
-  border: 1px solid rgba(255, 68, 68, 0.2);
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: 600;
-  font-family: inherit;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: all 0.2s;
-}
-
-.clear-btn:hover {
-  background: rgba(255, 68, 68, 0.2);
-  transform: translateY(-1px);
-}
-
-.mode-switch {
-  display: flex;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  padding: 4px;
-  gap: 4px;
-}
-
-.mode-btn {
-  flex: 1;
-  padding: 8px;
-  border: none;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.6);
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-.mode-btn.active {
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-}
-
-.lvq-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.action-btn {
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  color: white;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.action-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.action-btn.primary {
-  background: rgba(68, 100, 255, 0.2);
-  border-color: rgba(68, 100, 255, 0.4);
-  color: #88aaff;
-}
-
-.action-btn.primary:hover:not(:disabled) {
-  background: rgba(68, 100, 255, 0.3);
-}
-
-.action-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.checkbox-row {
-  margin-top: 12px;
-  display: flex;
-  align-items: center;
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.8);
-  cursor: pointer;
-  user-select: none;
-}
-
-.checkbox-label input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  accent-color: #4464ff;
-  cursor: pointer;
-}
-</style>
