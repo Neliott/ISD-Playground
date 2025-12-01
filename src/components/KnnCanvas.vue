@@ -352,9 +352,11 @@ function handleDoubleClick(event) {
   emit('add-point', { x, y })
 }
 
+let resizeObserver = null
+
 onMounted(() => {
   if (containerRef.value) {
-    const resizeObserver = new ResizeObserver(entries => {
+    resizeObserver = new ResizeObserver(entries => {
       for (let entry of entries) {
         width.value = entry.contentRect.width
         height.value = entry.contentRect.height
@@ -371,6 +373,12 @@ onMounted(() => {
   initWebGL()
   updateWebGL()
   drawUI()
+})
+
+onUnmounted(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+  }
 })
 
 watch(() => [props.points, props.k, props.classes, props.showLvq, props.prototypes], () => {

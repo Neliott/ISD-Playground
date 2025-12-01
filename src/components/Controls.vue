@@ -118,7 +118,6 @@ defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'clear', 'ini
   display: flex;
   flex-direction: column;
   gap: 32px;
-  height: 100%;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 

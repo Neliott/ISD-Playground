@@ -38,8 +38,8 @@ function initLvq() {
   
   // Find bounds or use canvas size (approx 800x600)
   // Ideally we should base this on data distribution, but random is fine for MVP
-  const width = 800
-  const height = 600
+  const width = window.innerWidth
+  const height = window.innerHeight
   
   for (const cls of classes) {
     for (let i = 0; i < prototypesPerClass; i++) {
