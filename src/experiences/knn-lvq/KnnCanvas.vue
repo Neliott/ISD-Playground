@@ -25,6 +25,14 @@ const props = defineProps({
   prototypes: {
     type: Array,
     default: () => []
+  },
+  distanceMetric: {
+    type: String,
+    default: 'euclidean'
+  },
+  distanceWeighting: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -68,12 +76,25 @@ uniform vec3 u_classColors[${MAX_CLASSES}];
 uniform int u_classIds[${MAX_CLASSES}];
 uniform int u_numClasses;
 
+uniform int u_distMetric; // 0: Euclidean, 1: Manhattan, 2: Chebyshev
+uniform bool u_weighting;
+
 out vec4 fragColor;
 
 struct Neighbor {
   float dist;
   int classId;
 };
+
+float getDistance(vec2 p1, vec2 p2) {
+  vec2 d = abs(p1 - p2);
+  if (u_distMetric == 1) {
+    return d.x + d.y; // Manhattan
+  } else if (u_distMetric == 2) {
+    return max(d.x, d.y); // Chebyshev
+  }
+  return length(d); // Euclidean
+}
 
 void main() {
   vec2 st = gl_FragCoord.xy;
@@ -97,17 +118,13 @@ void main() {
   if (effectiveK > u_numPoints) effectiveK = u_numPoints;
 
   // Iterate over all points
-  // We read from the texture. Texture width is large enough.
   for (int i = 0; i < ${MAX_POINTS_TEXTURE_WIDTH}; i++) {
     if (i >= u_numPoints) break;
     
     vec4 p = texelFetch(u_pointsTexture, ivec2(i, 0), 0);
-    float dist = distance(vec2(x, y), p.xy);
+    float dist = getDistance(vec2(x, y), p.xy);
     
     // Insertion sort into neighbors array
-    // We only care if this point is closer than the furthest neighbor we have so far
-    // (which is neighbors[effectiveK-1] after the array is full)
-    
     if (dist < neighbors[effectiveK-1].dist) {
       // Find insertion index
       int insertIndex = -1;
@@ -132,28 +149,35 @@ void main() {
   }
 
   // Vote
-  int counts[${MAX_CLASSES}];
-  for(int i = 0; i < ${MAX_CLASSES}; i++) counts[i] = 0;
+  float weights[${MAX_CLASSES}];
+  for(int i = 0; i < ${MAX_CLASSES}; i++) weights[i] = 0.0;
 
   for(int i = 0; i < effectiveK; i++) {
     int cId = neighbors[i].classId;
+    float dist = neighbors[i].dist;
+    
+    float w = 1.0;
+    if (u_weighting) {
+      w = 1.0 / (dist + 0.1); // Add epsilon to avoid division by zero and extreme weights
+    }
+
     // Find index in u_classIds
     for(int j = 0; j < ${MAX_CLASSES}; j++) {
       if (j >= u_numClasses) break;
       if (u_classIds[j] == cId) {
-        counts[j]++;
+        weights[j] += w;
         break;
       }
     }
   }
 
   // Find winner
-  int maxCount = -1;
+  float maxWeight = -1.0;
   
   for(int i = 0; i < ${MAX_CLASSES}; i++) {
     if (i >= u_numClasses) break;
-    if (counts[i] > maxCount) {
-      maxCount = counts[i];
+    if (weights[i] > maxWeight) {
+      maxWeight = weights[i];
     }
   }
 
@@ -162,7 +186,8 @@ void main() {
 
   for(int i = 0; i < ${MAX_CLASSES}; i++) {
     if (i >= u_numClasses) break;
-    if (counts[i] == maxCount) {
+    // Use a small epsilon for float comparison
+    if (abs(weights[i] - maxWeight) < 0.0001) {
       winnerIndex = i;
       tieCount++;
     }
@@ -170,6 +195,11 @@ void main() {
 
   if (tieCount > 1) {
     if (u_resolveTies) {
+      // For weighted, ties are rare but possible.
+      // For unweighted, ties are common.
+      // Tie breaking strategy: nearest neighbor among the tied classes
+      
+      bool resolved = false;
       for(int i = 0; i < effectiveK; i++) {
         int cId = neighbors[i].classId;
         int cIndex = -1;
@@ -180,11 +210,13 @@ void main() {
             break;
           }
         }
-        if (cIndex != -1 && counts[cIndex] == maxCount) {
+        if (cIndex != -1 && abs(weights[cIndex] - maxWeight) < 0.0001) {
           winnerIndex = cIndex;
+          resolved = true;
           break;
         }
       }
+      if (!resolved) winnerIndex = -1;
     } else {
       winnerIndex = -1;
     }
@@ -280,6 +312,12 @@ function updateWebGL() {
   gl.uniform1i(gl.getUniformLocation(program, 'u_k'), kValue)
   gl.uniform1i(gl.getUniformLocation(program, 'u_numPoints'), activePoints.length)
   gl.uniform1i(gl.getUniformLocation(program, 'u_resolveTies'), props.resolveTies ? 1 : 0)
+  
+  let metricId = 0
+  if (props.distanceMetric === 'manhattan') metricId = 1
+  if (props.distanceMetric === 'chebyshev') metricId = 2
+  gl.uniform1i(gl.getUniformLocation(program, 'u_distMetric'), metricId)
+  gl.uniform1i(gl.getUniformLocation(program, 'u_weighting'), props.distanceWeighting ? 1 : 0)
   
   // Update Points Texture
   if (activePoints.length > 0) {
@@ -421,7 +459,7 @@ onUnmounted(() => {
   }
 })
 
-watch(() => [props.points, props.k, props.classes, props.showLvq, props.prototypes, props.resolveTies], () => {
+watch(() => [props.points, props.k, props.classes, props.showLvq, props.prototypes, props.resolveTies, props.distanceMetric, props.distanceWeighting], () => {
   requestAnimationFrame(() => {
     updateWebGL()
     drawUI()

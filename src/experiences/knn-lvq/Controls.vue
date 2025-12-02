@@ -34,10 +34,18 @@ defineProps({
   initFromSameClass: {
     type: Boolean,
     default: false
+  },
+  distanceMetric: {
+    type: String,
+    default: 'euclidean'
+  },
+  distanceWeighting: {
+    type: Boolean,
+    default: false
   }
 })
 
-defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'update:resolveTies', 'update:prototypesPerClass', 'update:initFromSameClass', 'clear', 'init-lvq', 'train-lvq'])
+defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'update:resolveTies', 'update:prototypesPerClass', 'update:initFromSameClass', 'update:distanceMetric', 'update:distanceWeighting', 'clear', 'init-lvq', 'train-lvq'])
 </script>
 
 <template>
@@ -105,6 +113,37 @@ defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'update:resol
         </div>
         <span class="group-hover:text-white transition-colors">Resolve ties</span>
       </label>
+
+      <!-- Distance Controls -->
+      <div class="flex flex-col gap-4 pt-4 border-t border-white/10">
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-medium text-white/80">Distance Metric</label>
+          <div class="grid grid-cols-3 gap-1 bg-black/20 p-1 rounded-xl">
+            <button 
+              v-for="metric in ['euclidean', 'manhattan', 'chebyshev']" 
+              :key="metric"
+              class="py-1.5 px-2 rounded-lg text-xs font-medium capitalize transition-all duration-200"
+              :class="distanceMetric === metric ? 'bg-white/10 text-white shadow-lg' : 'text-white/40 hover:text-white/60'"
+              @click="$emit('update:distanceMetric', metric)"
+            >
+              {{ metric }}
+            </button>
+          </div>
+        </div>
+
+        <label class="flex items-center gap-3 text-sm text-white/70 cursor-pointer group select-none">
+          <div class="relative flex items-center">
+            <input 
+              type="checkbox" 
+              :checked="distanceWeighting"
+              @change="$emit('update:distanceWeighting', $event.target.checked)"
+              class="peer sr-only"
+            >
+            <div class="w-9 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+          </div>
+          <span class="group-hover:text-white transition-colors">Distance Weighting</span>
+        </label>
+      </div>
     </div>
 
     <!-- LVQ Controls -->

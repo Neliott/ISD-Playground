@@ -12,6 +12,8 @@ const resolveTies = ref(true)
 
 const prototypesPerClass = ref(3)
 const initFromSameClass = ref(false)
+const distanceMetric = ref('euclidean')
+const distanceWeighting = ref(false)
 
 const classes = [
   { id: 1, name: 'Red', color: '#ff4444' },
@@ -126,6 +128,8 @@ function trainLvq() {
         :resolve-ties="resolveTies"
         :k="k"
         :classes="classes"
+        :distance-metric="distanceMetric"
+        :distance-weighting="distanceWeighting"
         @add-point="addPoint"
       />
     </div>
@@ -140,6 +144,8 @@ function trainLvq() {
           v-model:resolveTies="resolveTies"
           v-model:prototypesPerClass="prototypesPerClass"
           v-model:initFromSameClass="initFromSameClass"
+          v-model:distanceMetric="distanceMetric"
+          v-model:distanceWeighting="distanceWeighting"
           :prototypes="prototypes"
           :classes="classes"
           @clear="clearPoints"
