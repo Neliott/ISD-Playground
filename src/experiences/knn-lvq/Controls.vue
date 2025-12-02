@@ -41,7 +41,7 @@ defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'update:resol
     <div class="flex flex-col gap-6">
       
       <div class="text-sm text-white/60 font-light">
-        Double-click to add points.
+        Click to add points.
       </div>
 
     <!-- Mode Switcher -->

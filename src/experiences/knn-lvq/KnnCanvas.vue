@@ -379,7 +379,7 @@ function drawUI() {
   }
 }
 
-function handleDoubleClick(event) {
+function handleClick(event) {
   const rect = uiCanvasRef.value.getBoundingClientRect()
   const x = event.clientX - rect.left
   const y = event.clientY - rect.top
@@ -443,10 +443,10 @@ watch(() => [props.points, props.k, props.classes, props.showLvq, props.prototyp
       class="block absolute top-0 left-0 z-10 cursor-crosshair"
       :width="width"
       :height="height"
-      @dblclick="handleDoubleClick"
+      @click="handleClick"
     ></canvas>
     <div v-if="points.length === 0" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white/30 pointer-events-none text-xl font-light tracking-widest uppercase select-none">
-      Double-click to add points
+      Click to add points
     </div>
   </div>
 </template>
