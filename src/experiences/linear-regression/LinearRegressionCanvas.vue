@@ -6,8 +6,8 @@ const props = defineProps({
     type: Array,
     required: true
   },
-  line: {
-    type: Object, // { m: number, b: number } or null
+  model: {
+    type: Object, // { type: 'linear'|'logarithmic', ...params } or null
     default: null
   }
 })
@@ -62,16 +62,61 @@ function draw() {
     ctx.stroke()
   }
 
-  // Draw line
-  if (props.line) {
-    const { m, b } = props.line
-    // y = mx + b
-    
+  // Draw regression model
+  if (props.model) {
     ctx.strokeStyle = '#ff4444'
     ctx.lineWidth = 3
     ctx.beginPath()
-    ctx.moveTo(0, b)
-    ctx.lineTo(width, m * width + b)
+
+    if (props.model.type === 'linear') {
+      const { m, b } = props.model
+      // y = mx + b
+      ctx.moveTo(0, b)
+      ctx.lineTo(width, m * width + b)
+    } else if (props.model.type === 'logarithmic') {
+      const { a, b } = props.model
+      // y = a + b * ln(x)
+      // We start from x=1 because ln(0) is undefined/-Infinity
+      for (let x = 1; x <= width; x += 2) {
+        const y = a + b * Math.log(x)
+        if (x === 1) ctx.moveTo(x, y)
+        else ctx.lineTo(x, y)
+      }
+    } else if (props.model.type === 'exponential') {
+      const { a, b } = props.model
+      // y = a * e^(bx)
+      for (let x = 0; x <= width; x += 2) {
+        const y = a * Math.exp(b * x)
+        if (x === 0) ctx.moveTo(x, y)
+        else ctx.lineTo(x, y)
+      }
+    } else if (props.model.type === 'power') {
+      const { a, b } = props.model
+      // y = a * x^b
+      // Start from x=1 to avoid 0^negative issues if b < 0
+      for (let x = 1; x <= width; x += 2) {
+        const y = a * Math.pow(x, b)
+        if (x === 1) ctx.moveTo(x, y)
+        else ctx.lineTo(x, y)
+      }
+    } else if (props.model.type === 'quadratic') {
+      const { a, b, c } = props.model
+      // y = ax^2 + bx + c
+      for (let x = 0; x <= width; x += 2) {
+        const y = a * x * x + b * x + c
+        if (x === 0) ctx.moveTo(x, y)
+        else ctx.lineTo(x, y)
+      }
+    } else if (props.model.type === 'cubic') {
+      const { a, b, c, d } = props.model
+      // y = ax^3 + bx^2 + cx + d
+      for (let x = 0; x <= width; x += 2) {
+        const y = a * x * x * x + b * x * x + c * x + d
+        if (x === 0) ctx.moveTo(x, y)
+        else ctx.lineTo(x, y)
+      }
+    }
+    
     ctx.stroke()
   }
 }
@@ -84,7 +129,7 @@ function onClick(event) {
 }
 
 watch(() => props.points, draw, { deep: true })
-watch(() => props.line, draw, { deep: true })
+watch(() => props.model, draw, { deep: true })
 
 onMounted(() => {
   window.addEventListener('resize', resize)
