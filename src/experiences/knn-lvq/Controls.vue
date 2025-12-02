@@ -26,10 +26,18 @@ defineProps({
   resolveTies: {
     type: Boolean,
     default: true
+  },
+  prototypesPerClass: {
+    type: Number,
+    default: 3
+  },
+  initFromSameClass: {
+    type: Boolean,
+    default: false
   }
 })
 
-defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'update:resolveTies', 'clear', 'init-lvq', 'train-lvq'])
+defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'update:resolveTies', 'update:prototypesPerClass', 'update:initFromSameClass', 'clear', 'init-lvq', 'train-lvq'])
 </script>
 
 <template>
@@ -102,9 +110,40 @@ defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'update:resol
     <!-- LVQ Controls -->
     <div v-if="showLvq" class="flex flex-col gap-4">
       <div class="flex justify-between items-center">
-        <label class="text-sm font-medium text-white/80">Prototypes</label>
+        <label class="text-sm font-medium text-white/80">Total Prototypes</label>
         <span class="px-2 py-1 bg-white/10 rounded-md text-xs font-bold text-white font-mono">{{ prototypes.length }}</span>
       </div>
+
+      <div class="flex justify-between items-center">
+        <label for="proto-count" class="text-sm font-medium text-white/80">Per Class</label>
+        <span class="px-2 py-1 bg-white/10 rounded-md text-xs font-bold text-white font-mono">{{ prototypesPerClass }}</span>
+      </div>
+      
+      <div class="relative h-6 flex items-center">
+        <input 
+          id="proto-count"
+          type="range" 
+          min="1" 
+          max="10" 
+          step="1"
+          :value="prototypesPerClass"
+          @input="$emit('update:prototypesPerClass', Number($event.target.value))"
+          class="w-full h-1 bg-white/20 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110"
+        >
+      </div>
+
+      <label class="flex items-center gap-3 text-sm text-white/70 cursor-pointer group select-none">
+        <div class="relative flex items-center">
+          <input 
+            type="checkbox" 
+            :checked="initFromSameClass"
+            @change="$emit('update:initFromSameClass', $event.target.checked)"
+            class="peer sr-only"
+          >
+          <div class="w-9 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+        </div>
+        <span class="group-hover:text-white transition-colors">Init from data</span>
+      </label>
       
       <div class="grid grid-cols-2 gap-2">
         <button 

@@ -10,6 +10,9 @@ const prototypes = ref([])
 const showLvq = ref(false)
 const resolveTies = ref(true)
 
+const prototypesPerClass = ref(3)
+const initFromSameClass = ref(false)
+
 const classes = [
   { id: 1, name: 'Red', color: '#ff4444' },
   { id: 2, name: 'Blue', color: '#4444ff' },
@@ -34,8 +37,6 @@ function clearPoints() {
 
 function initLvq() {
   prototypes.value = []
-  // Create 3 prototypes per class
-  const prototypesPerClass = 3
   
   // Find bounds or use canvas size (approx 800x600)
   // Ideally we should base this on data distribution, but random is fine for MVP
@@ -43,10 +44,31 @@ function initLvq() {
   const height = window.innerHeight
   
   for (const cls of classes) {
-    for (let i = 0; i < prototypesPerClass; i++) {
+    // Filter points for this class if we are initializing from same class
+    const classPoints = initFromSameClass.value 
+      ? points.value.filter(p => p.classId === cls.id)
+      : []
+
+    for (let i = 0; i < prototypesPerClass.value; i++) {
+      let x, y
+      
+      if (initFromSameClass.value && classPoints.length > 0) {
+        // Pick random point from classPoints
+        const randomPoint = classPoints[Math.floor(Math.random() * classPoints.length)]
+        x = randomPoint.x
+        y = randomPoint.y
+        // Add small jitter to avoid perfect overlap
+        x += (Math.random() - 0.5) * 5
+        y += (Math.random() - 0.5) * 5
+      } else {
+        // Random position
+        x = Math.random() * width
+        y = Math.random() * height
+      }
+
       prototypes.value.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
+        x,
+        y,
         classId: cls.id,
         id: Date.now() + Math.random()
       })
@@ -111,11 +133,13 @@ function trainLvq() {
     <!-- Controls Container -->
     <div class="absolute top-4 left-4 bottom-4 w-80 z-10 flex flex-col pointer-events-none">
       <div class="pointer-events-auto h-full">
-        <Controls
+  <Controls
           v-model:k="k"
           v-model:selectedClass="selectedClass"
           v-model:showLvq="showLvq"
           v-model:resolveTies="resolveTies"
+          v-model:prototypesPerClass="prototypesPerClass"
+          v-model:initFromSameClass="initFromSameClass"
           :prototypes="prototypes"
           :classes="classes"
           @clear="clearPoints"
