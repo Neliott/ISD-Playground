@@ -3,7 +3,9 @@ import { ref, computed } from 'vue'
 import LinearRegressionCanvas from './LinearRegressionCanvas.vue'
 import ExperiencePanel from '../../components/ExperiencePanel.vue'
 import BackToMenu from '../../components/BackToMenu.vue'
-import Tooltip from '../../components/Tooltip.vue'
+import ControlBox from '../../components/controls/ControlBox.vue'
+import Select from '../../components/controls/Select.vue'
+import Button from '../../components/controls/Button.vue'
 
 const points = ref([])
 const selectedModel = ref('linear') // 'linear', 'logarithmic', 'exponential', 'power', 'quadratic', 'cubic'
@@ -16,6 +18,15 @@ const modelDescriptions = {
   quadratic: 'Parabolic curve, good for data with one peak or valley: y = ax² + bx + c',
   cubic: 'S-shaped curve, good for data with two turning points: y = ax³ + bx² + cx + d'
 }
+
+const modelOptions = computed(() => [
+  { label: 'linear', value: 'linear', tooltip: modelDescriptions.linear },
+  { label: 'logarithmic', value: 'logarithmic', tooltip: modelDescriptions.logarithmic },
+  { label: 'exponential', value: 'exponential', tooltip: modelDescriptions.exponential },
+  { label: 'power', value: 'power', tooltip: modelDescriptions.power },
+  { label: 'quadratic', value: 'quadratic', tooltip: modelDescriptions.quadratic },
+  { label: 'cubic', value: 'cubic', tooltip: modelDescriptions.cubic }
+])
 
 function addPoint(point) {
   points.value.push(point)
@@ -304,30 +315,22 @@ const regressionModel = computed(() => {
           Add at least {{ selectedModel === 'cubic' ? 4 : selectedModel === 'quadratic' ? 3 : 2 }} points
         </div>
 
-        <div class="flex flex-col gap-2">
-          <div class="grid grid-cols-2 gap-2 mb-2">
-            <Tooltip 
-              v-for="model in ['linear', 'logarithmic', 'exponential', 'power', 'quadratic', 'cubic']" 
-              :key="model"
-              :text="modelDescriptions[model]"
-              position="top"
-            >
-              <button 
-                @click="selectedModel = model"
-                class="w-full px-2 py-1 text-xs rounded border transition capitalize"
-                :class="selectedModel === model ? 'bg-green-500/20 border-green-500 text-green-400' : 'bg-white/5 border-white/10 text-text-muted hover:bg-white/10'"
-              >
-                {{ model }}
-              </button>
-            </Tooltip>
-          </div>
+        <div class="flex flex-col gap-4">
+          <ControlBox label="Model Type">
+            <Select 
+              :model-value="selectedModel"
+              @update:model-value="selectedModel = $event"
+              :options="modelOptions"
+              layout="grid"
+            />
+          </ControlBox>
 
-          <button 
+          <Button 
+            variant="danger"
             @click="clearPoints"
-            class="px-4 py-2 bg-red-600/80 hover:bg-red-600 rounded-lg text-white transition text-sm font-medium w-full"
           >
             Clear Points
-          </button>
+          </Button>
         </div>
       </ExperiencePanel>
     </div>
