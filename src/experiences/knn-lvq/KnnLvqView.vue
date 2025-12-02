@@ -124,17 +124,5 @@ function trainLvq() {
         />
       </div>
     </div>
-
-    <!-- Info Overlay -->
-    <div class="absolute top-6 right-6 z-20 text-right pointer-events-none select-none">
-      <h1 class="text-2xl font-bold text-white/90 tracking-tight">kNN Visualization</h1>
-      <p class="mt-1 text-sm text-white/60 font-light">Double-click to add points</p>
-      <router-link 
-        to="/" 
-        class="inline-block mt-3 text-sm text-white/70 hover:text-white transition-colors pointer-events-auto"
-      >
-        ← Back to Home
-      </router-link>
-    </div>
   </div>
 </template>

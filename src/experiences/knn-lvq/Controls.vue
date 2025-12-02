@@ -1,4 +1,7 @@
 <script setup>
+import ExperiencePanel from '../../components/ExperiencePanel.vue'
+import BackToMenu from '../../components/BackToMenu.vue'
+
 defineProps({
   k: {
     type: Number,
@@ -30,8 +33,17 @@ defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'update:resol
 </script>
 
 <template>
-  <div class="flex flex-col gap-6 p-6 bg-surface/60 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl h-full overflow-y-auto">
-    
+  <ExperiencePanel title="kNN Visualization" class="h-full overflow-y-auto pointer-events-auto">
+    <template #header>
+      <BackToMenu />
+    </template>
+
+    <div class="flex flex-col gap-6">
+      
+      <div class="text-sm text-white/60 font-light">
+        Double-click to add points.
+      </div>
+
     <!-- Mode Switcher -->
     <div class="flex flex-col gap-3">
       <label class="text-xs font-medium text-white/50 uppercase tracking-wider">Mode</label>
@@ -147,5 +159,6 @@ defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'update:resol
         Clear Canvas
       </button>
     </div>
-  </div>
+    </div>
+  </ExperiencePanel>
 </template>

@@ -12,6 +12,15 @@ const experiences = [
     route: '/knn-lvq',
     color: '#4464ff',
     icon: '🎯'
+  },
+  {
+    id: 'linear-regression',
+    title: 'Linear Regression',
+    subtitle: 'Regression Algorithms',
+    description: 'Interactive visualization of Simple Linear Regression. Click to add points and see the best fit line update in real-time.',
+    route: '/linear-regression',
+    color: '#ff4444',
+    icon: '📈'
   }
 ]
 
