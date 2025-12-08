@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import Controls from './Controls.vue'
 import KnnCanvas from './KnnCanvas.vue'
+import ExplanationOverlay from '../../components/ExplanationOverlay.vue'
 
 const k = ref(3)
 const selectedClass = ref(1)
@@ -19,6 +20,35 @@ const distanceWeighting = ref(false)
 const lvqLearningRate = ref(0.05)
 const lvqEpochs = ref(1)
 const lvqK = ref(1)
+
+const showExplanation = ref(false)
+
+const explanationSlides = [
+  {
+    title: 'k-Nearest Neighbors (k-NN)',
+    content: `
+      <p class="mb-4">k-NN is a simple, intuitive algorithm. It's like asking your neighbors for advice.</p>
+      <p class="mb-4">"If my <strong>k</strong> closest neighbors are mostly red, then I'm probably red too."</p>
+      <ul class="list-disc pl-5 space-y-2 text-left mx-auto max-w-lg">
+        <li>It doesn't "learn" anything beforehand (Lazy Learning).</li>
+        <li>It memorizes all data points.</li>
+        <li>Classification happens instantly when you ask for it.</li>
+      </ul>
+    `
+  },
+  {
+    title: 'Learning Vector Quantization (LVQ)',
+    content: `
+      <p class="mb-4">LVQ is different. It uses <strong>Prototypes</strong> (the big circles) to represent classes.</p>
+      <p class="mb-4">Instead of keeping all data, we only keep these prototypes. This saves memory and is faster.</p>
+      <p>During training:</p>
+      <ul class="list-disc pl-5 space-y-2 text-left mx-auto max-w-lg">
+        <li>Prototypes move <strong>TOWARDS</strong> points of their same class (Attraction).</li>
+        <li>Prototypes move <strong>AWAY</strong> from points of other classes (Repulsion).</li>
+      </ul>
+    `
+  }
+]
 
 const classes = [
   { id: 1, name: 'Red', color: '#ff4444' },
@@ -173,8 +203,17 @@ function trainLvq() {
           @clear="clearPoints"
           @init-lvq="initLvq"
           @train-lvq="trainLvq"
+          @explain="showExplanation = true"
         />
       </div>
     </div>
+
+    <!-- Explanation Overlay -->
+    <ExplanationOverlay
+      :is-visible="showExplanation"
+      title="How it works"
+      :slides="explanationSlides"
+      @close="showExplanation = false"
+    />
   </div>
 </template>

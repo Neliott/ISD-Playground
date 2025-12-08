@@ -6,9 +6,43 @@ import BackToMenu from '../../components/BackToMenu.vue'
 import ControlBox from '../../components/controls/ControlBox.vue'
 import Select from '../../components/controls/Select.vue'
 import Button from '../../components/controls/Button.vue'
+import ExplanationOverlay from '../../components/ExplanationOverlay.vue'
 
 const points = ref([])
 const selectedModel = ref('linear') // 'linear', 'logarithmic', 'exponential', 'power', 'quadratic', 'cubic'
+
+const showExplanation = ref(false)
+
+const explanationSlides = [
+  {
+    title: 'Linear Regression',
+    content: `
+      <p class="mb-4">Linear Regression is a fundamental algorithm in machine learning that helps us understand the relationship between two variables.</p>
+      <p>The goal is to find a straight line <strong>y = mx + b</strong> that best fits the data points.</p>
+    `
+  },
+  {
+    title: 'Mean Squared Error (MSE)',
+    content: `
+      <p class="mb-4">How do we know which line is the "best"? We measure the error.</p>
+      <p class="mb-4">For every point, we calculate the vertical distance to the line (the <em>residual</em>).</p>
+      <p>We <strong>square</strong> these distances to handle negatives and penalize large errors, then take the average.</p>
+      <div class="mt-4 p-4 bg-white/5 rounded border border-white/10 font-mono text-sm">
+        MSE = (1/n) * Σ(y_actual - y_predicted)²
+      </div>
+    `
+  },
+  {
+    title: 'Finding the Solution',
+    content: `
+      <p class="mb-4">There are two main ways to find the best <strong>m</strong> (slope) and <strong>b</strong> (intercept):</p>
+      <ul class="list-disc pl-5 space-y-2 text-left mx-auto max-w-lg">
+        <li><strong>Closed-Form (Algebraic):</strong> Calculating the exact solution directly using formulas (like the Ordinary Least Squares method used in this demo). Fast for small datasets.</li>
+        <li><strong>Iterative (Gradient Descent):</strong> Starting with a random line and slightly adjusting it to reduce error step-by-step. Necessary for massive datasets or complex models.</li>
+      </ul>
+    `
+  }
+]
 
 const modelDescriptions = {
   linear: 'Finds the best-fitting straight line: y = mx + b',
@@ -331,7 +365,16 @@ const metrics = computed(() => {
     <div class="absolute top-4 left-4 w-80">
       <ExperiencePanel title="Regression">
         <template #header>
-          <BackToMenu />
+          <div class="flex items-center gap-2">
+            <BackToMenu />
+            <div class="flex-1"></div>
+            <button 
+              @click="showExplanation = true"
+              class="text-xs text-text-muted hover:text-white underline transition-colors"
+            >
+              How it works?
+            </button>
+          </div>
         </template>
         
         <div class="mb-4 text-sm text-text-muted">
@@ -401,5 +444,13 @@ const metrics = computed(() => {
         </div>
       </ExperiencePanel>
     </div>
+
+    <!-- Explanation Overlay -->
+    <ExplanationOverlay
+      :is-visible="showExplanation"
+      title="Understanding Regression"
+      :slides="explanationSlides"
+      @close="showExplanation = false"
+    />
   </div>
 </template>

@@ -63,13 +63,22 @@ defineProps({
   }
 })
 
-defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'update:resolveTies', 'update:prototypesPerClass', 'update:lvqInitMode', 'update:distanceMetric', 'update:distanceWeighting', 'update:learningRate', 'update:trainEpochs', 'update:lvqK', 'clear', 'init-lvq', 'train-lvq'])
+defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'update:resolveTies', 'update:prototypesPerClass', 'update:lvqInitMode', 'update:distanceMetric', 'update:distanceWeighting', 'update:learningRate', 'update:trainEpochs', 'update:lvqK', 'clear', 'init-lvq', 'train-lvq', 'explain'])
 </script>
 
 <template>
   <ExperiencePanel title="kNN Visualization" class="h-full overflow-y-auto pointer-events-auto">
     <template #header>
-      <BackToMenu />
+      <div class="flex items-center gap-2">
+        <BackToMenu />
+        <div class="flex-1"></div>
+        <button 
+          @click="$emit('explain')"
+          class="text-xs text-text-muted hover:text-white underline transition-colors"
+        >
+          How it works?
+        </button>
+      </div>
     </template>
 
     <div class="flex flex-col gap-6">
