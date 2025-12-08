@@ -3,6 +3,8 @@ import { ref } from 'vue'
 import Controls from './Controls.vue'
 import KnnCanvas from './KnnCanvas.vue'
 import ExplanationOverlay from '../../components/ExplanationOverlay.vue'
+import VisualKnnVoting from '../../components/visuals/VisualKnnVoting.vue'
+import VisualLvqUpdate from '../../components/visuals/VisualLvqUpdate.vue'
 
 const k = ref(3)
 const selectedClass = ref(1)
@@ -27,26 +29,19 @@ const explanationSlides = [
   {
     title: 'k-Nearest Neighbors (k-NN)',
     content: `
-      <p class="mb-4">k-NN is a simple, intuitive algorithm. It's like asking your neighbors for advice.</p>
-      <p class="mb-4">"If my <strong>k</strong> closest neighbors are mostly red, then I'm probably red too."</p>
-      <ul class="list-disc pl-5 space-y-2 text-left mx-auto max-w-lg">
-        <li>It doesn't "learn" anything beforehand (Lazy Learning).</li>
-        <li>It memorizes all data points.</li>
-        <li>Classification happens instantly when you ask for it.</li>
-      </ul>
-    `
+      <p class="mb-4 text-sm">k-NN classifies a point by looking at its closest neighbors.</p>
+      <p class="text-sm">Ideally, we want to find the majority class within a certain radius (k).</p>
+    `,
+    component: VisualKnnVoting
   },
   {
-    title: 'Learning Vector Quantization (LVQ)',
+    title: 'LVQ Training',
     content: `
-      <p class="mb-4">LVQ is different. It uses <strong>Prototypes</strong> (the big circles) to represent classes.</p>
-      <p class="mb-4">Instead of keeping all data, we only keep these prototypes. This saves memory and is faster.</p>
-      <p>During training:</p>
-      <ul class="list-disc pl-5 space-y-2 text-left mx-auto max-w-lg">
-        <li>Prototypes move <strong>TOWARDS</strong> points of their same class (Attraction).</li>
-        <li>Prototypes move <strong>AWAY</strong> from points of other classes (Repulsion).</li>
-      </ul>
-    `
+      <p class="mb-4 text-sm">LVQ moves prototypes to better represent classes.</p>
+      <p class="text-sm"><strong>Attraction:</strong> If the nearest prototype is the correct class, it moves closer.</p>
+      <p class="text-sm"><strong>Repulsion:</strong> If it's the wrong class, it moves away.</p>
+    `,
+    component: VisualLvqUpdate
   }
 ]
 

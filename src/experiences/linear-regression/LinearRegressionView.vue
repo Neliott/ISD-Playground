@@ -7,6 +7,8 @@ import ControlBox from '../../components/controls/ControlBox.vue'
 import Select from '../../components/controls/Select.vue'
 import Button from '../../components/controls/Button.vue'
 import ExplanationOverlay from '../../components/ExplanationOverlay.vue'
+import VisualResiduals from '../../components/visuals/VisualResiduals.vue'
+import VisualGradientDescent from '../../components/visuals/VisualGradientDescent.vue'
 
 const points = ref([])
 const selectedModel = ref('linear') // 'linear', 'logarithmic', 'exponential', 'power', 'quadratic', 'cubic'
@@ -17,30 +19,25 @@ const explanationSlides = [
   {
     title: 'Linear Regression',
     content: `
-      <p class="mb-4">Linear Regression is a fundamental algorithm in machine learning that helps us understand the relationship between two variables.</p>
-      <p>The goal is to find a straight line <strong>y = mx + b</strong> that best fits the data points.</p>
+      <p class="mb-4">Linear Regression finds the relationship between variables.</p>
+      <p>We want the straight line that best fits our data.</p>
     `
   },
   {
-    title: 'Mean Squared Error (MSE)',
+    title: 'Visualizing Error',
     content: `
-      <p class="mb-4">How do we know which line is the "best"? We measure the error.</p>
-      <p class="mb-4">For every point, we calculate the vertical distance to the line (the <em>residual</em>).</p>
-      <p>We <strong>square</strong> these distances to handle negatives and penalize large errors, then take the average.</p>
-      <div class="mt-4 p-4 bg-white/5 rounded border border-white/10 font-mono text-sm">
-        MSE = (1/n) * Σ(y_actual - y_predicted)²
-      </div>
-    `
+      <p class="mb-4 text-sm">We calculate the distance from each point to the line.</p>
+      <p class="text-sm">Squaring these distances (the red squares) makes all errors positive and punishes big outliers more.</p>
+    `,
+    component: VisualResiduals
   },
   {
-    title: 'Finding the Solution',
+    title: 'Iterative Learning',
     content: `
-      <p class="mb-4">There are two main ways to find the best <strong>m</strong> (slope) and <strong>b</strong> (intercept):</p>
-      <ul class="list-disc pl-5 space-y-2 text-left mx-auto max-w-lg">
-        <li><strong>Closed-Form (Algebraic):</strong> Calculating the exact solution directly using formulas (like the Ordinary Least Squares method used in this demo). Fast for small datasets.</li>
-        <li><strong>Iterative (Gradient Descent):</strong> Starting with a random line and slightly adjusting it to reduce error step-by-step. Necessary for massive datasets or complex models.</li>
-      </ul>
-    `
+      <p class="mb-4 text-sm">Gradient Descent is like a ball rolling down a hill.</p>
+      <p class="text-sm">The "hill" is the Error. The ball tries to find the lowest point (parameters m, b) to minimize error.</p>
+    `,
+    component: VisualGradientDescent
   }
 ]
 
