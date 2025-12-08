@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, width } from 'vue'
+import { onMounted, ref } from 'vue'
 
 const canvas = ref(null)
 

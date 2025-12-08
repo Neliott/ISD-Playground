@@ -10,6 +10,8 @@ import ExplanationOverlay from '../../components/ExplanationOverlay.vue'
 import VisualResiduals from '../../components/visuals/VisualResiduals.vue'
 import VisualGradientDescent from '../../components/visuals/VisualGradientDescent.vue'
 import VisualOverfitting from '../../components/visuals/VisualOverfitting.vue'
+import VisualScatterIntro from '../../components/visuals/VisualScatterIntro.vue'
+import VisualSlopeIntercept from '../../components/visuals/VisualSlopeIntercept.vue'
 
 const points = ref([])
 const selectedModel = ref('linear') // 'linear', 'logarithmic', 'exponential', 'power', 'quadratic', 'cubic'
@@ -23,7 +25,8 @@ const explanationSlides = [
       <p class="text-xl text-white mb-6">Unlocking the Power of Prediction.</p>
       <p class="mb-4">Linear Regression is the "Hello World" of Machine Learning. It assumes there is a simple underlying trend in your data.</p>
       <p>By finding this trend, we can predict future values based on past observations.</p>
-    `
+    `,
+    component: VisualScatterIntro
   },
   {
     title: 'The Goal: Best Fit',
@@ -34,7 +37,8 @@ const explanationSlides = [
         <code class="text-green-400">y = mx + b</code>
         <p class="text-xs mt-2 text-text-muted">m = Slope (Trend direction)<br>b = Intercept (Starting value)</p>
       </div>
-    `
+    `,
+    component: VisualSlopeIntercept
   },
   {
     title: 'Visualizing Error (MSE)',
