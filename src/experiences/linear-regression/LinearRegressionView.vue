@@ -271,6 +271,53 @@ const regressionModel = computed(() => {
     return { type: 'linear', m, b }
   }
 })
+
+function predict(x, model) {
+  if (!model) return 0
+  switch (model.type) {
+    case 'linear': return model.m * x + model.b
+    case 'logarithmic': return model.a + model.b * Math.log(x)
+    case 'exponential': return model.a * Math.exp(model.b * x)
+    case 'power': return model.a * Math.pow(x, model.b)
+    case 'quadratic': return model.a * x * x + model.b * x + model.c
+    case 'cubic': return model.a * Math.pow(x, 3) + model.b * Math.pow(x, 2) + model.c * x + model.d
+    default: return 0
+  }
+}
+
+const metrics = computed(() => {
+  if (!regressionModel.value || points.value.length < 2) return null
+  
+  const n = points.value.length
+  let sumY = 0
+  for (const p of points.value) sumY += p.y
+  const meanY = sumY / n
+
+  let sse = 0
+  let sst = 0
+  let mae = 0
+
+  for (const p of points.value) {
+    const yPred = predict(p.x, regressionModel.value)
+    const yActual = p.y
+    
+    const error = yActual - yPred
+    sse += error * error
+    sst += (yActual - meanY) * (yActual - meanY)
+    mae += Math.abs(error)
+  }
+
+  const mse = sse / n
+  const rmse = Math.sqrt(mse)
+  const r2 = sst === 0 ? 1 : 1 - (sse / sst)
+
+  return {
+    mse,
+    rmse,
+    mae,
+    r2
+  }
+})
 </script>
 
 <template>
@@ -311,6 +358,26 @@ const regressionModel = computed(() => {
             y = {{ regressionModel.a.toExponential(2) }}x³ + {{ regressionModel.b.toExponential(2) }}x² + {{ regressionModel.c.toExponential(2) }}x + {{ regressionModel.d.toFixed(1) }}
           </template>
         </div>
+
+        <div v-if="metrics" class="grid grid-cols-2 gap-2 mb-4 text-xs">
+          <div class="bg-white/5 p-2 rounded border border-white/5 flex flex-col">
+            <span class="text-white/40 uppercase tracking-wider text-[10px]">MSE</span>
+            <span class="font-mono text-white/90">{{ metrics.mse.toFixed(2) }}</span>
+          </div>
+          <div class="bg-white/5 p-2 rounded border border-white/5 flex flex-col">
+            <span class="text-white/40 uppercase tracking-wider text-[10px]">RMSE</span>
+            <span class="font-mono text-white/90">{{ metrics.rmse.toFixed(2) }}</span>
+          </div>
+          <div class="bg-white/5 p-2 rounded border border-white/5 flex flex-col">
+            <span class="text-white/40 uppercase tracking-wider text-[10px]">MAE</span>
+            <span class="font-mono text-white/90">{{ metrics.mae.toFixed(2) }}</span>
+          </div>
+          <div class="bg-white/5 p-2 rounded border border-white/5 flex flex-col">
+            <span class="text-white/40 uppercase tracking-wider text-[10px]">R²</span>
+            <span class="font-mono text-white/90">{{ metrics.r2.toFixed(4) }}</span>
+          </div>
+        </div>
+
         <div v-else class="mb-4 text-sm text-text-muted italic">
           Add at least {{ selectedModel === 'cubic' ? 4 : selectedModel === 'quadratic' ? 3 : 2 }} points
         </div>

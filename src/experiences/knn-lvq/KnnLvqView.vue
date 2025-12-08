@@ -15,6 +15,11 @@ const initFromSameClass = ref(false)
 const distanceMetric = ref('euclidean')
 const distanceWeighting = ref(false)
 
+// LVQ Parameters
+const lvqLearningRate = ref(0.05)
+const lvqEpochs = ref(1)
+const lvqK = ref(1)
+
 const classes = [
   { id: 1, name: 'Red', color: '#ff4444' },
   { id: 2, name: 'Blue', color: '#4444ff' },
@@ -81,35 +86,37 @@ function initLvq() {
 function trainLvq() {
   if (points.value.length === 0 || prototypes.value.length === 0) return
   
-  const learningRate = 0.05
-  
-  // One epoch: iterate through all data points
-  for (const point of points.value) {
-    // Find nearest prototype
-    let minDist = Infinity
-    let nearestProtoIndex = -1
-    
-    for (let i = 0; i < prototypes.value.length; i++) {
-      const proto = prototypes.value[i]
-      const dist = Math.sqrt((point.x - proto.x) ** 2 + (point.y - proto.y) ** 2)
-      if (dist < minDist) {
-        minDist = dist
-        nearestProtoIndex = i
-      }
-    }
-    
-    if (nearestProtoIndex !== -1) {
-      const proto = prototypes.value[nearestProtoIndex]
-      
-      // Update position
-      if (proto.classId === point.classId) {
-        // Move closer
-        proto.x += learningRate * (point.x - proto.x)
-        proto.y += learningRate * (point.y - proto.y)
-      } else {
-        // Move away
-        proto.x -= learningRate * (point.x - proto.x)
-        proto.y -= learningRate * (point.y - proto.y)
+  // Run for specified number of epochs
+  for (let epoch = 0; epoch < lvqEpochs.value; epoch++) {
+    // Iterate through all data points
+    for (const point of points.value) {
+      // Find all prototypes with their distances
+      const protoDistances = prototypes.value.map((proto, index) => ({
+        index,
+        proto,
+        dist: Math.sqrt((point.x - proto.x) ** 2 + (point.y - proto.y) ** 2)
+      }))
+
+      // Sort by distance
+      protoDistances.sort((a, b) => a.dist - b.dist)
+
+      // Update the K nearest prototypes
+      // We limit by prototypes.length just in case lvqK > num prototypes
+      const kToUpdate = Math.min(lvqK.value, protoDistances.length)
+
+      for (let i = 0; i < kToUpdate; i++) {
+        const { proto } = protoDistances[i]
+        
+        // Update position
+        if (proto.classId === point.classId) {
+          // Move closer
+          proto.x += lvqLearningRate.value * (point.x - proto.x)
+          proto.y += lvqLearningRate.value * (point.y - proto.y)
+        } else {
+          // Move away
+          proto.x -= lvqLearningRate.value * (point.x - proto.x)
+          proto.y -= lvqLearningRate.value * (point.y - proto.y)
+        }
       }
     }
   }
@@ -146,6 +153,11 @@ function trainLvq() {
           v-model:initFromSameClass="initFromSameClass"
           v-model:distanceMetric="distanceMetric"
           v-model:distanceWeighting="distanceWeighting"
+          
+          v-model:learningRate="lvqLearningRate"
+          v-model:trainEpochs="lvqEpochs"
+          v-model:lvqK="lvqK"
+
           :prototypes="prototypes"
           :classes="classes"
           @clear="clearPoints"

@@ -48,10 +48,22 @@ defineProps({
   distanceWeighting: {
     type: Boolean,
     default: false
+  },
+  learningRate: {
+    type: Number,
+    default: 0.05
+  },
+  trainEpochs: {
+    type: Number,
+    default: 1
+  },
+  lvqK: {
+    type: Number,
+    default: 1
   }
 })
 
-defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'update:resolveTies', 'update:prototypesPerClass', 'update:initFromSameClass', 'update:distanceMetric', 'update:distanceWeighting', 'clear', 'init-lvq', 'train-lvq'])
+defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'update:resolveTies', 'update:prototypesPerClass', 'update:initFromSameClass', 'update:distanceMetric', 'update:distanceWeighting', 'update:learningRate', 'update:trainEpochs', 'update:lvqK', 'clear', 'init-lvq', 'train-lvq'])
 </script>
 
 <template>
@@ -171,6 +183,52 @@ defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'update:resol
           </div>
         </Tooltip>
       </ControlBox>
+
+      <!-- Advanced LVQ Settings -->
+       <div class="flex flex-col gap-4 pt-4 border-t border-white/10">
+        <ControlBox label="Learning Rate">
+          <template #value>
+            <span class="px-2 py-1 bg-white/10 rounded-md text-xs font-bold text-white font-mono">{{ learningRate }}</span>
+          </template>
+          <Tooltip text="How fast prototypes move. High = fast but unstable. Low = precise but slow." position="right">
+            <Slider 
+              :model-value="learningRate"
+              @update:model-value="$emit('update:learningRate', $event)"
+              :min="0.01"
+              :max="0.5"
+              :step="0.01"
+            />
+          </Tooltip>
+        </ControlBox>
+
+        <ControlBox label="Epochs per Click">
+           <template #value>
+            <span class="px-2 py-1 bg-white/10 rounded-md text-xs font-bold text-white font-mono">{{ trainEpochs }}</span>
+          </template>
+          <Tooltip text="Number of training rounds per button click. Increase this to speed up training." position="right">
+            <Slider 
+              :model-value="trainEpochs"
+              @update:model-value="$emit('update:trainEpochs', $event)"
+              :min="1"
+              :max="50"
+            />
+          </Tooltip>
+        </ControlBox>
+
+        <ControlBox label="Update Count (k)">
+           <template #value>
+            <span class="px-2 py-1 bg-white/10 rounded-md text-xs font-bold text-white font-mono">{{ lvqK }}</span>
+          </template>
+          <Tooltip text="How many closest prototypes to update for each data point" position="right">
+            <Slider 
+              :model-value="lvqK"
+              @update:model-value="$emit('update:lvqK', $event)"
+              :min="1"
+              :max="5"
+            />
+          </Tooltip>
+        </ControlBox>
+      </div>
       
       <div class="grid grid-cols-2 gap-2">
         <Tooltip text="Scatters new prototypes on the canvas. Do this if the current training is stuck or if you changed the number of prototypes." position="right">
