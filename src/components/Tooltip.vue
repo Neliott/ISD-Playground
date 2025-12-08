@@ -14,52 +14,59 @@ const props = defineProps({
 
 const isHovered = ref(false)
 const triggerRef = ref(null)
+const tooltipRef = ref(null)
 const tooltipStyle = ref({})
-const arrowStyle = ref({})
 
 function updatePosition() {
-  if (!triggerRef.value) return
+  if (!triggerRef.value || !tooltipRef.value) return
   
-  const rect = triggerRef.value.getBoundingClientRect()
+  const triggerRect = triggerRef.value.getBoundingClientRect()
+  const tooltipRect = tooltipRef.value.getBoundingClientRect()
   const gap = 8 // Space between trigger and tooltip
+  const padding = 8 // Min distance from screen edge
   
   let top = 0
   let left = 0
   
-  // Default styles
-  const style = { position: 'fixed', zIndex: 9999 }
-  
+  // Initial position calculation without transform
   switch (props.position) {
     case 'top':
-      top = rect.top - gap
-      left = rect.left + rect.width / 2
-      style.transform = 'translate(-50%, -100%)'
+      top = triggerRect.top - gap - tooltipRect.height
+      left = triggerRect.left + (triggerRect.width - tooltipRect.width) / 2
       break
     case 'bottom':
-      top = rect.bottom + gap
-      left = rect.left + rect.width / 2
-      style.transform = 'translate(-50%, 0)'
+      top = triggerRect.bottom + gap
+      left = triggerRect.left + (triggerRect.width - tooltipRect.width) / 2
       break
     case 'left':
-      top = rect.top + rect.height / 2
-      left = rect.left - gap
-      style.transform = 'translate(-100%, -50%)'
+      top = triggerRect.top + (triggerRect.height - tooltipRect.height) / 2
+      left = triggerRect.left - gap - tooltipRect.width
       break
     case 'right':
-      top = rect.top + rect.height / 2
-      left = rect.right + gap
-      style.transform = 'translate(0, -50%)'
+      top = triggerRect.top + (triggerRect.height - tooltipRect.height) / 2
+      left = triggerRect.right + gap
       break
   }
   
-  style.top = `${top}px`
-  style.left = `${left}px`
+  // Boundary checks and clamping
+  const maxLeft = window.innerWidth - tooltipRect.width - padding
+  const maxTop = window.innerHeight - tooltipRect.height - padding
   
-  tooltipStyle.value = style
+  // Clamp values
+  left = Math.max(padding, Math.min(left, maxLeft))
+  top = Math.max(padding, Math.min(top, maxTop))
+  
+  tooltipStyle.value = {
+    position: 'fixed',
+    zIndex: 9999,
+    top: `${top}px`,
+    left: `${left}px`
+  }
 }
 
 function onMouseEnter() {
   isHovered.value = true
+  // Wait for tooltip to render so we can get its dimensions
   nextTick(() => {
     updatePosition()
   })
@@ -86,14 +93,11 @@ function onMouseEnter() {
       >
         <div 
           v-if="isHovered"
+          ref="tooltipRef"
           class="fixed px-3 py-2 text-xs font-medium text-white bg-gray-900/90 backdrop-blur-md rounded-lg shadow-xl pointer-events-none border border-white/10 max-w-xs leading-relaxed"
           :style="tooltipStyle"
         >
           {{ text }}
-          <!-- Arrow (simplified, just a small square) -->
-          <!-- Implementing a perfect arrow with fixed positioning is tricky without a library like floating-ui, 
-               so we'll omit it for simplicity or add it inside if needed. 
-               For now, a clean floating tooltip is enough. -->
         </div>
       </Transition>
     </Teleport>
