@@ -37,9 +37,9 @@ defineProps({
     type: Number,
     default: 3
   },
-  initFromSameClass: {
-    type: Boolean,
-    default: false
+  lvqInitMode: {
+    type: String,
+    default: 'random'
   },
   distanceMetric: {
     type: String,
@@ -63,7 +63,7 @@ defineProps({
   }
 })
 
-defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'update:resolveTies', 'update:prototypesPerClass', 'update:initFromSameClass', 'update:distanceMetric', 'update:distanceWeighting', 'update:learningRate', 'update:trainEpochs', 'update:lvqK', 'clear', 'init-lvq', 'train-lvq'])
+defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'update:resolveTies', 'update:prototypesPerClass', 'update:lvqInitMode', 'update:distanceMetric', 'update:distanceWeighting', 'update:learningRate', 'update:trainEpochs', 'update:lvqK', 'clear', 'init-lvq', 'train-lvq'])
 </script>
 
 <template>
@@ -170,19 +170,19 @@ defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'update:resol
         </Tooltip>
       </ControlBox>
 
-      <ControlBox>
-        <Tooltip text="Starting with random positions takes longer to learn. Initializing with real data points gives the algorithm a 'head start' towards the correct solution." position="right">
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-white/70">Init from data</span>
-            <Toggle 
-              :model-value="initFromSameClass"
-              @update:model-value="$emit('update:initFromSameClass', $event)"
-              :labels="['Off', 'On']"
-              class="w-24"
-            />
-          </div>
-        </Tooltip>
-      </ControlBox>
+        <ControlBox label="Init Strategy">
+          <Tooltip text="Starting with random positions takes longer to learn. Initializing with real data points gives the algorithm a 'head start' towards the correct solution." position="right">
+          <Select 
+            :model-value="lvqInitMode"
+            @update:model-value="$emit('update:lvqInitMode', $event)"
+            :options="[
+              { label: 'Random', value: 'random', tooltip: 'Random positions across the entire canvas.' },
+              { label: 'From Class Sample', value: 'class_sample', tooltip: 'Pick random existing points from the class to start.' },
+              { label: 'Class Center', value: 'class_center', tooltip: 'Start at the average position (center of gravity) of the class points.' }
+            ]"
+          />
+          </Tooltip>
+        </ControlBox>
 
       <!-- Advanced LVQ Settings -->
        <div class="flex flex-col gap-4 pt-4 border-t border-white/10">

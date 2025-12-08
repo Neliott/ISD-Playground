@@ -11,7 +11,7 @@ const showLvq = ref(false)
 const resolveTies = ref(true)
 
 const prototypesPerClass = ref(3)
-const initFromSameClass = ref(false)
+const lvqInitMode = ref('random')
 const distanceMetric = ref('euclidean')
 const distanceWeighting = ref(false)
 
@@ -51,24 +51,34 @@ function initLvq() {
   const height = window.innerHeight
   
   for (const cls of classes) {
-    // Filter points for this class if we are initializing from same class
-    const classPoints = initFromSameClass.value 
-      ? points.value.filter(p => p.classId === cls.id)
-      : []
+    // Filter points for this class
+    const classPoints = points.value.filter(p => p.classId === cls.id)
+    
+    // Calculate centroid if needed
+    let centroid = { x: width / 2, y: height / 2 }
+    if (lvqInitMode.value === 'class_center' && classPoints.length > 0) {
+      const sumX = classPoints.reduce((sum, p) => sum + p.x, 0)
+      const sumY = classPoints.reduce((sum, p) => sum + p.y, 0)
+      centroid = { x: sumX / classPoints.length, y: sumY / classPoints.length }
+    }
 
     for (let i = 0; i < prototypesPerClass.value; i++) {
       let x, y
       
-      if (initFromSameClass.value && classPoints.length > 0) {
+      if (lvqInitMode.value === 'class_sample' && classPoints.length > 0) {
         // Pick random point from classPoints
         const randomPoint = classPoints[Math.floor(Math.random() * classPoints.length)]
         x = randomPoint.x
         y = randomPoint.y
-        // Add small jitter to avoid perfect overlap
-        x += (Math.random() - 0.5) * 5
-        y += (Math.random() - 0.5) * 5
+        // Add small jitter
+        x += (Math.random() - 0.5) * 10
+        y += (Math.random() - 0.5) * 10
+      } else if (lvqInitMode.value === 'class_center' && classPoints.length > 0) {
+        // Start at centroid with jitter
+        x = centroid.x + (Math.random() - 0.5) * 20
+        y = centroid.y + (Math.random() - 0.5) * 20
       } else {
-        // Random position
+        // Random position (fallback for 'random' or empty classes)
         x = Math.random() * width
         y = Math.random() * height
       }
@@ -150,7 +160,7 @@ function trainLvq() {
           v-model:showLvq="showLvq"
           v-model:resolveTies="resolveTies"
           v-model:prototypesPerClass="prototypesPerClass"
-          v-model:initFromSameClass="initFromSameClass"
+          v-model:lvqInitMode="lvqInitMode"
           v-model:distanceMetric="distanceMetric"
           v-model:distanceWeighting="distanceWeighting"
           
