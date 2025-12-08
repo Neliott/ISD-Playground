@@ -9,6 +9,7 @@ import Button from '../../components/controls/Button.vue'
 import ExplanationOverlay from '../../components/ExplanationOverlay.vue'
 import VisualResiduals from '../../components/visuals/VisualResiduals.vue'
 import VisualGradientDescent from '../../components/visuals/VisualGradientDescent.vue'
+import VisualOverfitting from '../../components/visuals/VisualOverfitting.vue'
 
 const points = ref([])
 const selectedModel = ref('linear') // 'linear', 'logarithmic', 'exponential', 'power', 'quadratic', 'cubic'
@@ -19,25 +20,52 @@ const explanationSlides = [
   {
     title: 'Linear Regression',
     content: `
-      <p class="mb-4">Linear Regression finds the relationship between variables.</p>
-      <p>We want the straight line that best fits our data.</p>
+      <p class="text-xl text-white mb-6">Unlocking the Power of Prediction.</p>
+      <p class="mb-4">Linear Regression is the "Hello World" of Machine Learning. It assumes there is a simple underlying trend in your data.</p>
+      <p>By finding this trend, we can predict future values based on past observations.</p>
     `
   },
   {
-    title: 'Visualizing Error',
+    title: 'The Goal: Best Fit',
     content: `
-      <p class="mb-4 text-sm">We calculate the distance from each point to the line.</p>
-      <p class="text-sm">Squaring these distances (the red squares) makes all errors positive and punishes big outliers more.</p>
+      <p class="mb-4">Our objective is to draw a line that passes as close as possible to all data points.</p>
+      <p class="mb-4">But how do we define "close"? With mathematics!</p>
+      <div class="p-4 bg-white/5 border border-white/10 rounded-lg">
+        <code class="text-green-400">y = mx + b</code>
+        <p class="text-xs mt-2 text-text-muted">m = Slope (Trend direction)<br>b = Intercept (Starting value)</p>
+      </div>
+    `
+  },
+  {
+    title: 'Visualizing Error (MSE)',
+    content: `
+      <p class="mb-4">To find the best line, we calculate the <strong>Residuals</strong> (red lines).</p>
+      <p class="mb-4">We simplify the problem by calculating the <strong>Mean Squared Error (MSE)</strong>.</p>
+      <p class="text-sm text-text-muted">The animated squares you see represent the error being "squared". Our goal is to make the total area of these red squares as small as possible.</p>
     `,
     component: VisualResiduals
   },
   {
-    title: 'Iterative Learning',
+    title: 'How It Learns',
     content: `
-      <p class="mb-4 text-sm">Gradient Descent is like a ball rolling down a hill.</p>
-      <p class="text-sm">The "hill" is the Error. The ball tries to find the lowest point (parameters m, b) to minimize error.</p>
+      <p class="mb-4">Imagine a blindfolded hiker trying to find a valley's bottom.</p>
+      <p class="mb-4">This process is called <strong>Gradient Descent</strong>.</p>
+      <ul class="list-disc pl-5 space-y-2 text-sm text-text-muted">
+        <li>The 'Ball' is our model's parameters.</li>
+        <li>The 'Hill' is the total error.</li>
+        <li>We take small steps downhill until we stop moving.</li>
+      </ul>
     `,
     component: VisualGradientDescent
+  },
+  {
+    title: 'The Danger of Complexity',
+    content: `
+      <p class="mb-4">More power isn't always better.</p>
+      <p class="mb-4">If we use a complex model (like a high-degree polynomial) on simple data, we risk <strong>Overfitting</strong>.</p>
+      <p class="text-sm text-text-muted">Watch the animation cycle through Underfitting (too simple), Good Fit, and Overfitting (memorizing noise).</p>
+    `,
+    component: VisualOverfitting
   }
 ]
 
