@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, onMounted, watch, onUnmounted } from 'vue'
 
 const props = defineProps({
   path: {
@@ -15,67 +15,97 @@ const props = defineProps({
 const emit = defineEmits(['set-start'])
 
 const canvasRef = ref(null)
-const width = 600
-const height = 400
-
+// We use a resize observer to handle full screen resizing
+const width = ref(800)
+const height = ref(600)
 const range = 4 // -4 to 4
 
 // Coordinate transforms
-const toScreenX = (x) => (x / range + 0.5) * width
-const toScreenY = (y) => (-y / range + 0.5) * height // Invert Y
-const toMathX = (sx) => (sx / width - 0.5) * range
-const toMathY = (sy) => -(sy / height - 0.5) * range // Invert Y
+const toScreenX = (x) => (x / range + 0.5) * width.value
+const toScreenY = (y) => (-y / range + 0.5) * height.value // Invert Y
+const toMathX = (sx) => (sx / width.value - 0.5) * range
+const toMathY = (sy) => -(sy / height.value - 0.5) * range // Invert Y
+
+let ctx = null
 
 function draw() {
-  const ctx = canvasRef.value.getContext('2d')
+  if (!canvasRef.value) return
+  ctx = canvasRef.value.getContext('2d')
   if (!ctx) return
   
-  // 1. Draw Heatmap (Only once ideally, but we'll redraw for simplicity or cache)
-  // For better perf, we could cache this in an offscreen canvas.
-  const imgData = ctx.createImageData(width, height)
+  // Clear
+  ctx.clearRect(0, 0, width.value, height.value)
+  
+  // 1. Draw Heatmap 
+  // Optimization: For a large full screen canvas, evaluating f(x,y) per pixel is slow (HD = 2M pixels).
+  // We should render at lower resolution and scale up, or use a shader (WebGL).
+  // For now, let's render at partial resolution (e.g., 200x200) and scale up via CSS or drawImage.
+  // Actually, let's just use a reasonable fixed resolution for the heatmap backing store.
+  
+  const mapWidth = 200
+  const mapHeight = 200
+  const imgData = ctx.createImageData(mapWidth, mapHeight)
   const data = imgData.data
   
-  for (let py = 0; py < height; py++) {
-    for (let px = 0; px < width; px++) {
-      const x = toMathX(px)
-      const y = toMathY(py)
+  for (let py = 0; py < mapHeight; py++) {
+    for (let px = 0; px < mapWidth; px++) {
+      // Map pixel to math space directly
+      const x = (px / mapWidth - 0.5) * range
+      const y = -(py / mapHeight - 0.5) * range // Invert Y
       const val = props.f(x, y)
       
-      // Color map: Dark Blue (low) -> Green -> Yellow -> Red (high)
-      // Normalize val roughly -1 to 5 for coloring
       const t = Math.max(0, Math.min(1, (val + 1) / 5))
       
-      // Simple gradient logic
       let r, g, b
       if (t < 0.5) {
-         // Blue to Green
          const localT = t * 2
          r = 0
          g = Math.floor(255 * localT)
          b = Math.floor(255 * (1 - localT))
       } else {
-         // Green to Red
          const localT = (t - 0.5) * 2
          r = Math.floor(255 * localT)
          g = Math.floor(255 * (1 - localT))
          b = 0
       }
       
-      // Add visual "contours" by darkening bands
       if (Math.floor(val * 4) % 2 === 0) {
         r *= 0.9; g *= 0.9; b *= 0.9;
       }
       
-      const index = (py * width + px) * 4
+      const index = (py * mapWidth + px) * 4
       data[index] = r
       data[index + 1] = g
       data[index + 2] = b
       data[index + 3] = 255
     }
   }
-  ctx.putImageData(imgData, 0, 0)
   
-  // 2. Draw Path
+  // Create a temp canvas to hold the heatmap
+  const tempCanvas = document.createElement('canvas')
+  tempCanvas.width = mapWidth
+  tempCanvas.height = mapHeight
+  tempCanvas.getContext('2d').putImageData(imgData, 0, 0)
+  
+  // Draw scaled up to full screen
+  ctx.imageSmoothingEnabled = true // Smooth it out
+  ctx.drawImage(tempCanvas, 0, 0, width.value, height.value)
+  
+  // 2. Draw axes/grid just for reference
+  ctx.strokeStyle = 'rgba(255,255,255,0.1)'
+  ctx.lineWidth = 1
+  
+  // X Axis
+  ctx.beginPath()
+  ctx.moveTo(0, height.value/2); ctx.lineTo(width.value, height.value/2)
+  ctx.stroke()
+  
+  // Y Axis
+  ctx.beginPath()
+  ctx.moveTo(width.value/2, 0); ctx.lineTo(width.value/2, height.value)
+  ctx.stroke()
+
+  // 3. Draw Path
   if (props.path.length > 0) {
     ctx.beginPath()
     ctx.strokeStyle = 'white'
@@ -95,7 +125,7 @@ function draw() {
     // Draw Start Point
     const pStart = props.path[0]
     ctx.beginPath()
-    ctx.fillStyle = '#44ff44' // Green
+    ctx.fillStyle = '#44ff44' 
     ctx.arc(toScreenX(pStart.x), toScreenY(pStart.y), 6, 0, Math.PI * 2)
     ctx.fill()
     
@@ -114,6 +144,15 @@ function draw() {
   }
 }
 
+function resize() {
+  if (canvasRef.value) {
+    const parent = canvasRef.value.parentElement
+    width.value = parent.clientWidth
+    height.value = parent.clientHeight
+    draw()
+  }
+}
+
 function handleClick(event) {
   const rect = canvasRef.value.getBoundingClientRect()
   const sx = event.clientX - rect.left
@@ -126,11 +165,16 @@ function handleClick(event) {
 }
 
 onMounted(() => {
-  draw()
+  window.addEventListener('resize', resize)
+  resize() // Initial sizing
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', resize)
 })
 
 watch(() => props.path, () => {
-  requestAnimationFrame(draw) // Sync with animation frame
+  requestAnimationFrame(draw) 
 }, { deep: true })
 
 </script>
@@ -140,7 +184,7 @@ watch(() => props.path, () => {
     ref="canvasRef" 
     :width="width" 
     :height="height" 
-    class="w-full h-auto bg-black cursor-crosshair rounded-xl shadow-2xl"
+    class="w-full h-full cursor-crosshair block"
     @click="handleClick"
   ></canvas>
 </template>

@@ -2,6 +2,8 @@
 import { ref, computed } from 'vue'
 import DraggableMatrix from './components/DraggableMatrix.vue'
 import MetricsPanel from './components/MetricsPanel.vue'
+import ExperiencePanel from '../../components/ExperiencePanel.vue'
+import BackToMenu from '../../components/BackToMenu.vue'
 
 const matrixStats = ref({
   tp: 0,
@@ -16,50 +18,40 @@ function updateStats(newStats) {
 </script>
 
 <template>
-  <div class="min-h-screen bg-background text-white p-8 pt-24 font-sans">
-    <div class="max-w-6xl mx-auto">
-      <header class="mb-12">
-        <h1 class="text-4xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-success-300 to-white">
-          Confusion Matrix Manipulator
-        </h1>
-        <p class="text-lg text-white/60 max-w-2xl">
-          Drag the sample points into the matrix to see how <strong>Precision</strong>, <strong>Recall</strong>, and <strong>F1-Score</strong> change.
-          Understand the trade-off between avoiding false alarms and missing real detections.
-        </p>
-      </header>
+  <div class="relative w-full h-screen overflow-hidden bg-background font-sans">
+      
+    <!-- Full Screen Interaction Area -->
+    <div class="absolute inset-0 pt-0">
+        <DraggableMatrix @stats-update="updateStats" />
+    </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Interactive Matrix -->
-        <div class="col-span-1 lg:col-span-2 bg-surface/50 border border-white/10 rounded-3xl p-8 backdrop-blur-sm relative min-h-[500px]">
-           <h2 class="text-xl font-bold mb-6 flex items-center gap-3">
-            <span class="bg-success/20 p-2 rounded-lg text-success-300">1</span>
-            Drag & Drop Zone
-          </h2>
-          <DraggableMatrix @stats-update="updateStats" />
-        </div>
+    <!-- Floating Panel -->
+    <div class="absolute top-4 left-4 w-80 z-20 pointer-events-none">
+        <div class="pointer-events-auto">
+            <ExperiencePanel title="Confusion Matrix">
+                <template #header>
+                    <div class="flex items-center gap-2">
+                        <BackToMenu />
+                        <div class="flex-1"></div>
+                    </div>
+                </template>
 
-        <!-- Metrics Panel -->
-        <div class="col-span-1 bg-surface/50 border border-white/10 rounded-3xl p-8 backdrop-blur-sm h-fit sticky top-24">
-          <h2 class="text-xl font-bold mb-6 flex items-center gap-3">
-            <span class="bg-primary/20 p-2 rounded-lg text-primary-300">2</span>
-            Live Metrics
-          </h2>
-          <MetricsPanel :stats="matrixStats" />
-          
-          <!-- Explanation -->
-           <div class="mt-8 pt-8 border-t border-white/10 text-sm text-white/60 leading-relaxed space-y-4">
-             <p>
-               <strong class="text-white">Precision:</strong> How many selected items are relevant? (Don't spam me).
-             </p>
-             <p>
-               <strong class="text-white">Recall:</strong> How many relevant items are selected? (Don't miss anything).
-             </p>
-             <p class="italic opacity-70">
-               Move all Green dots to "Predicted Negative" to see Recall drop to 0!
-             </p>
-           </div>
+                 <div class="mb-4 text-sm text-text-muted">
+                    Drag the sample points into the matrix to see how <strong>Precision</strong>, <strong>Recall</strong>, and <strong>F1-Score</strong> change.
+                </div>
+
+                <MetricsPanel :stats="matrixStats" />
+
+                 <div class="mt-4 pt-4 border-t border-white/10 text-xs text-white/60 space-y-2">
+                    <p>
+                        <strong class="text-white">Precision:</strong> Relevance (minimize False Positives).
+                    </p>
+                    <p>
+                        <strong class="text-white">Recall:</strong> Completeness (minimize False Negatives).
+                    </p>
+                </div>
+            </ExperiencePanel>
         </div>
-      </div>
     </div>
   </div>
 </template>

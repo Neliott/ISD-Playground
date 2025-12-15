@@ -2,11 +2,13 @@
 import { ref, computed, onUnmounted } from 'vue'
 import LossSurface from './components/LossSurface.vue'
 import DescentControls from './components/DescentControls.vue'
+import ExperiencePanel from '../../components/ExperiencePanel.vue'
+import BackToMenu from '../../components/BackToMenu.vue'
+import ExplanationOverlay from '../../components/ExplanationOverlay.vue' // Optional but good to have ready
 
 // ---------- Optimization Logic ----------
 
 // The function we are optimizing: f(x, y) = x^2 + y^2 + sin(3x) + sin(3y)
-// (A simple bowl with some ripples to create local minima)
 function f(x, y) {
   return (x * x + y * y) * 0.5 - 0.2 * Math.cos(3 * x) - 0.2 * Math.cos(3 * y)
 }
@@ -80,26 +82,32 @@ reset()
 </script>
 
 <template>
-  <div class="min-h-screen bg-background text-white p-8 pt-24 font-sans">
-    <div class="max-w-6xl mx-auto">
-      <header class="mb-12">
-        <h1 class="text-4xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-accent-300 to-white">
-          Gradient Descent Playground
-        </h1>
-        <p class="text-lg text-white/60 max-w-2xl">
-          Visualize how optimization algorithms "walk down the hill" to find the minimum of a valid function (Low Loss).
-          Adjust the <strong>Learning Rate</strong> to see how step size affects convergence!
-        </p>
-      </header>
+  <div class="relative w-full h-screen overflow-hidden bg-black">
+    
+    <!-- Full Screen Visualization -->
+    <div class="absolute inset-0">
+        <LossSurface 
+            :path="path" 
+            :f="f"
+            @set-start="setStartPoint"
+        />
+    </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Controls -->
-        <div class="col-span-1 bg-surface/50 border border-white/10 rounded-3xl p-8 backdrop-blur-sm h-fit">
-          <h2 class="text-xl font-bold mb-6 flex items-center gap-3">
-            <span class="bg-accent/20 p-2 rounded-lg text-accent-300">1</span>
-            Parameters
-          </h2>
-          <DescentControls 
+    <!-- Floating Panel -->
+    <div class="absolute top-4 left-4 w-80 z-10">
+      <ExperiencePanel title="Gradient Descent">
+        <template #header>
+           <div class="flex items-center gap-2">
+            <BackToMenu />
+            <div class="flex-1"></div>
+          </div>
+        </template>
+
+        <div class="mb-6 text-sm text-text-muted">
+           Visualize how optimization algorithms "walk down the hill" to minimize loss.
+        </div>
+
+        <DescentControls 
             v-model:learningRate="learningRate"
             :isRunning="isRunning"
             @start="start"
@@ -108,37 +116,27 @@ reset()
             @step="step"
           />
           
-          <div class="mt-8 pt-8 border-t border-white/10 text-sm text-white/60">
-             <h3 class="font-bold text-white mb-2">Current State</h3>
+          <div class="mt-6 pt-6 border-t border-white/10 text-xs text-white/60 font-mono">
              <div class="flex justify-between mb-1">
                <span>Iteration:</span>
-               <span class="font-mono text-accent-100">{{ path.length - 1 }}</span>
+               <span class="text-accent-100">{{ path.length - 1 }}</span>
              </div>
              <div class="flex justify-between mb-1">
                <span>Position:</span>
-               <span class="font-mono text-accent-100">({{ path[path.length-1]?.x.toFixed(2) }}, {{ path[path.length-1]?.y.toFixed(2) }})</span>
+               <span class="text-accent-100">({{ path[path.length-1]?.x.toFixed(2) }}, {{ path[path.length-1]?.y.toFixed(2) }})</span>
+             </div>
+             <div class="flex justify-between">
+                <span>Loss:</span>
+                <span class="text-accent-100">{{ f(path[path.length-1]?.x, path[path.length-1]?.y).toFixed(4) }}</span>
              </div>
           </div>
-        </div>
-
-        <!-- Visualization -->
-        <div class="col-span-1 lg:col-span-2 bg-black/40 border border-white/10 rounded-3xl p-4 relative overflow-hidden flex flex-col items-center justify-center">
-          <h2 class="absolute top-6 left-8 text-xl font-bold flex items-center gap-3 z-10 pointer-events-none">
-            <span class="bg-primary/20 p-2 rounded-lg text-primary-300">2</span>
-            Loss Surface
-          </h2>
           
-          <LossSurface 
-            :path="path" 
-            :f="f"
-            @set-start="setStartPoint"
-          />
-          
-          <div class="absolute bottom-6 right-8 text-xs text-white/40 pointer-events-none italic">
-            Click on map to change starting point
+          <div class="mt-4 text-[10px] text-white/30 italic text-center">
+            Click anywhere on the map to set a new starting point.
           </div>
-        </div>
-      </div>
+
+      </ExperiencePanel>
     </div>
+
   </div>
 </template>
