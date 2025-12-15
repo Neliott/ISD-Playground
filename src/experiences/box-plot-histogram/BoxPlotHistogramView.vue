@@ -16,58 +16,44 @@ function updateData(newData) {
 </script>
 
 <template>
-  <div class="relative w-full h-screen overflow-hidden bg-background font-sans flex flex-col">
+  <div class="w-full h-screen overflow-hidden bg-background font-sans flex flex-col">
     
-    <!-- Main Visualization Area: Split Screen -->
-    <div class="absolute inset-0 flex flex-col md:flex-row pl-0 md:pl-80">
-        
-        <!-- Histogram Top/Left -->
-        <div class="flex-1 relative border-b md:border-b-0 md:border-r border-white/10 p-8 flex flex-col">
-             <div class="absolute top-4 left-8 text-xl font-bold flex items-center gap-3 opacity-50">
-                <span class="text-accent-300">Histogram</span>
-            </div>
-            <div class="flex-1 flex items-center">
-                 <Histogram :data="dataPoints" />
-            </div>
-        </div>
-
-        <!-- Box Plot Bottom/Right -->
-        <div class="flex-1 relative p-8 flex flex-col">
-             <div class="absolute top-4 left-8 text-xl font-bold flex items-center gap-3 opacity-50">
-                <span class="text-primary-300">Box Plot</span>
-            </div>
-            <div class="flex-1 flex items-center">
-                 <BoxPlot :data="dataPoints" />
-            </div>
-        </div>
-
+    <!-- Header / Nav (Minimal) -->
+    <div class="absolute top-4 left-4 z-50">
+        <BackToMenu />
     </div>
 
-    <!-- Floating Panel -->
-    <div class="absolute top-4 left-4 w-80 z-20 pointer-events-none md:pointer-events-auto">
-        <div class="pointer-events-auto">
-            <ExperiencePanel title="Distribution">
-                <template #header>
-                    <div class="flex items-center gap-2">
-                        <BackToMenu />
-                        <div class="flex-1"></div>
-                    </div>
-                </template>
+    <!-- Section 1: Histogram (Top) -->
+    <div class="flex-1 relative border-b border-white/10 p-6 flex flex-col min-h-0">
+         <div class="absolute top-4 right-8 text-xl font-bold flex items-center gap-3 opacity-50 pointer-events-none">
+            <span class="text-accent-300">Histogram</span>
+        </div>
+        <div class="flex-1 w-full h-full">
+             <Histogram :data="dataPoints" />
+        </div>
+    </div>
 
-                 <div class="mb-6 text-sm text-text-muted">
-                    Manipulate the data distribution below and observe how the Histogram and Box Plot respond.
-                </div>
+    <!-- Section 2: Box Plot (Middle) -->
+    <div class="flex-1 relative border-b border-white/10 p-6 flex flex-col min-h-0">
+         <div class="absolute top-4 right-8 text-xl font-bold flex items-center gap-3 opacity-50 pointer-events-none">
+            <span class="text-primary-300">Box Plot</span>
+        </div>
+        <div class="flex-1 w-full h-full flex items-center">
+             <BoxPlot :data="dataPoints" />
+        </div>
+    </div>
 
-                <div class="mb-6">
-                    <h3 class="text-xs font-bold text-white mb-2 uppercase tracking-wide">Data Control</h3>
-                    <DataControl :data="dataPoints" @update="updateData" />
-                </div>
-
-                <div class="pt-4 border-t border-white/10 text-xs text-white/50 leading-relaxed">
-                    <strong>Histogram:</strong> Shows frequency shape.<br>
-                    <strong>Box Plot:</strong> Shows statistics (Median, Quartiles).
-                </div>
-            </ExperiencePanel>
+    <!-- Section 3: Data Control (Bottom) -->
+    <div class="flex-1 relative p-6 flex flex-col min-h-0 bg-surface/30">
+        <div class="absolute top-4 right-8 text-xl font-bold flex items-center gap-3 opacity-50 pointer-events-none">
+            <span class="text-white">Data Control</span>
+        </div>
+        
+        <div class="w-full max-w-4xl mx-auto flex flex-col h-full justify-center">
+             <div class="mb-2 text-sm text-text-muted text-center">
+                Click to add points • Drag to move • Right-click to remove
+            </div>
+            <DataControl :data="dataPoints" @update="updateData" />
         </div>
     </div>
 

@@ -70,41 +70,37 @@ function removePoint(index) {
 </script>
 
 <template>
-  <div class="relative h-32 select-none">
+  <div class="relative w-full h-32 select-none flex items-center justify-center">
     <!-- Axis Line -->
-    <div class="absolute top-1/2 left-0 right-0 h-1 bg-white/20 rounded-full"></div>
+    <div class="absolute w-full h-1 bg-white/20 rounded-full"></div>
     
     <!-- Ticks -->
     <div v-for="i in 11" :key="i" 
-         class="absolute top-1/2 w-0.5 h-4 bg-white/10 -translate-y-1/2 transition-colors duration-300 hover:bg-white/30"
+         class="absolute h-4 w-0.5 bg-white/10 -translate-y-1/2 transition-colors duration-300 hover:bg-white/30"
          :style="{ left: `${(i-1) * 10}%` }">
          <span class="absolute top-6 left-1/2 -translate-x-1/2 text-xs text-white/30 font-mono">{{ (i-1) * 10 }}</span>
     </div>
 
-    <!-- Interaction Area -->
+    <!-- Interaction Area (Full Width/height of parent container effectively) -->
     <div ref="containerRef" 
-         class="absolute inset-0 cursor-crosshair z-0"
+         class="absolute inset-0 -my-8 cursor-crosshair z-0"
          @click="addPoint">
     </div>
 
     <!-- Data Points -->
     <div v-for="(val, index) in data" 
          :key="index"
-         class="data-point absolute top-1/2 w-6 h-6 -ml-3 -mt-3 bg-white rounded-full shadow-[0_0_15px_rgba(255,255,255,0.3)] cursor-grab active:cursor-grabbing hover:scale-125 transition-transform z-10 flex items-center justify-center group"
+         class="data-point absolute w-8 h-8 -ml-4 -mt-4 bg-white rounded-full shadow-[0_0_20px_rgba(255,255,255,0.4)] cursor-grab active:cursor-grabbing hover:scale-110 transition-transform z-10 flex items-center justify-center group border-2 border-primary/20"
          :style="{ left: `${valueToPercent(val)}%` }"
          @mousedown.stop="startDrag(index, $event)"
          @contextmenu.prevent="removePoint(index)"
     >
-      <div class="w-2 h-2 bg-primary rounded-full"></div>
+      <div class="w-3 h-3 bg-primary rounded-full shadow-inner"></div>
       
       <!-- Tooltip -->
-      <div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-surface text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity border border-white/10">
+      <div class="absolute -top-12 left-1/2 -translate-x-1/2 bg-surface text-white font-bold text-sm py-1 px-3 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity border border-white/10 shadow-xl whitespace-nowrap z-50">
         {{ Math.round(val) }}
       </div>
-    </div>
-    
-    <div class="absolute bottom-0 right-0 text-xs text-white/30 italic">
-      Left-click blank space to add • Drag to move • Right-click (or long press) to remove
     </div>
   </div>
 </template>
