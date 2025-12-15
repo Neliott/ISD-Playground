@@ -5,7 +5,7 @@ import { RouterView } from 'vue-router'
 <template>
   <RouterView v-slot="{ Component }">
     <transition name="fade" mode="out-in">
-      <div class="w-full h-full bg-background text-text overflow-hidden">
+      <div class="w-full h-full bg-background text-text">
         <component :is="Component" />
       </div>
     </transition>

@@ -7,8 +7,8 @@ const experiences = [
   {
     id: 'knn-lvq',
     title: 'kNN & LVQ',
-    subtitle: 'Classification Algorithms',
-    description: 'Interactive visualization of k-Nearest Neighbors and Learning Vector Quantization. Watch how algorithms learn and classify data in real-time.',
+    subtitle: 'Classification',
+    description: 'Interactive visualization of k-Nearest Neighbors. Watch how algorithms learn and classify data.',
     route: '/knn-lvq',
     color: '#4464ff',
     icon: '🎯'
@@ -16,11 +16,38 @@ const experiences = [
   {
     id: 'linear-regression',
     title: 'Linear Regression',
-    subtitle: 'Regression Algorithms',
-    description: 'Interactive visualization of Simple Linear Regression. Click to add points and see the best fit line update in real-time.',
+    subtitle: 'Regression',
+    description: 'Interactive Simpe Linear Regression. Add points and see the best fit line update.',
     route: '/linear-regression',
     color: '#ff4444',
     icon: '📈'
+  },
+  {
+    id: 'box-plot',
+    title: 'Box Plot vs Hist',
+    subtitle: 'Statistics',
+    description: 'Understanding data distribution. Compare how Histograms and Box Plots represent the same data.',
+    route: '/box-plot-histogram',
+    color: '#a855f7', // Purple
+    icon: '📊'
+  },
+  {
+    id: 'gradient-descent',
+    title: 'Gradient Descent',
+    subtitle: 'Optimization',
+    description: 'Play with the Learning Rate and watch an agent descend the Loss landscape.',
+    route: '/gradient-descent',
+    color: '#eab308', // Yellow
+    icon: '🏔️'
+  },
+  {
+    id: 'confusion-matrix',
+    title: 'Confusion Matrix',
+    subtitle: 'Evaluation',
+    description: 'Drag and drop samples to understand accuracy, precision, and recall trade-offs.',
+    route: '/confusion-matrix',
+    color: '#22c55e', // Green
+    icon: '⚖️'
   }
 ]
 
@@ -40,7 +67,7 @@ function handleMouseMove(e) {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col relative overflow-hidden bg-background text-white font-sans selection:bg-primary/30">
+  <div class="min-h-screen flex flex-col relative overflow-x-hidden bg-background text-white font-sans selection:bg-primary/30">
     <!-- Background Gradients -->
     <div class="absolute inset-0 z-0 pointer-events-none">
       <div class="absolute top-[15%] left-[15%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px]"></div>
