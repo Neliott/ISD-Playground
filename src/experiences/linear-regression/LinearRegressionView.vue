@@ -12,6 +12,7 @@ import VisualGradientDescent from '../../components/visuals/VisualGradientDescen
 import VisualOverfitting from '../../components/visuals/VisualOverfitting.vue'
 import VisualScatterIntro from '../../components/visuals/VisualScatterIntro.vue'
 import VisualSlopeIntercept from '../../components/visuals/VisualSlopeIntercept.vue'
+import VisualCorrelation from '../../components/visuals/VisualCorrelation.vue'
 
 const points = ref([])
 const selectedModel = ref('linear') // 'linear', 'logarithmic', 'exponential', 'power', 'quadratic', 'cubic'
@@ -70,6 +71,19 @@ const explanationSlides = [
       <p class="text-sm text-text-muted">Watch the animation cycle through Underfitting (too simple), Good Fit, and Overfitting (memorizing noise).</p>
     `,
     component: VisualOverfitting
+  },
+  {
+    title: 'Correlation Coefficient',
+    content: `
+      <p class="mb-4">How well does X predict Y?</p>
+      <p class="mb-4">The <strong>Pearson Coefficient (r)</strong> gives us a score from -1 to 1.</p>
+      <ul class="list-disc pl-5 space-y-2 text-sm text-text-muted">
+        <li><strong>1</strong>: Perfect positive correlation</li>
+        <li><strong>0</strong>: No correlation (random cloud)</li>
+        <li><strong>-1</strong>: Perfect negative correlation</li>
+      </ul>
+    `,
+    component: VisualCorrelation
   }
 ]
 
@@ -374,11 +388,31 @@ const metrics = computed(() => {
   const rmse = Math.sqrt(mse)
   const r2 = sst === 0 ? 1 : 1 - (sse / sst)
 
+  // Pearson Correlation Coefficient
+  let sumX = 0
+  let sumX2 = 0
+  let sumY_pearson = 0
+  let sumY2 = 0
+  let sumXY = 0
+
+  for (const p of points.value) {
+    sumX += p.x
+    sumX2 += p.x * p.x
+    sumY_pearson += p.y
+    sumY2 += p.y * p.y
+    sumXY += p.x * p.y
+  }
+
+  const numerator = n * sumXY - sumX * sumY_pearson
+  const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY_pearson * sumY_pearson))
+  const pearsonR = denominator === 0 ? 0 : numerator / denominator
+
   return {
     mse,
     rmse,
     mae,
-    r2
+    r2,
+    pearsonR
   }
 })
 </script>
@@ -447,6 +481,10 @@ const metrics = computed(() => {
           <div class="bg-white/5 p-2 rounded border border-white/5 flex flex-col">
             <span class="text-white/40 uppercase tracking-wider text-[10px]">R²</span>
             <span class="font-mono text-white/90">{{ metrics.r2.toFixed(4) }}</span>
+          </div>
+          <div class="bg-white/5 p-2 rounded border border-white/5 flex flex-col col-span-2">
+            <span class="text-white/40 uppercase tracking-wider text-[10px]">Pearson (r)</span>
+            <span class="font-mono text-white/90">{{ metrics.pearsonR.toFixed(4) }}</span>
           </div>
         </div>
 
