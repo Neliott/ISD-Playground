@@ -40,6 +40,33 @@ const f1 = computed(() => {
 
 <template>
   <div class="space-y-4">
+    <!-- 2x2 Matrix Grid -->
+    <div class="grid grid-cols-2 gap-2 mb-6 p-2 bg-white/5 data-[state=open]:animate-in fade-in zoom-in-95 rounded-xl border border-white/5">
+        
+        <!-- TP -->
+        <div class="bg-blue-500/10 border border-blue-500/20 p-3 rounded-lg flex flex-col items-center justify-center">
+            <span class="text-xs text-blue-200 uppercase font-bold tracking-wider mb-1">True Pos</span>
+            <span class="text-2xl font-black text-blue-400">{{ stats.tp }}</span>
+        </div>
+
+        <!-- FN -->
+        <div class="bg-orange-500/10 border border-orange-500/20 p-3 rounded-lg flex flex-col items-center justify-center">
+            <span class="text-xs text-orange-200 uppercase font-bold tracking-wider mb-1">False Neg</span>
+            <span class="text-2xl font-black text-orange-400">{{ stats.fn }}</span>
+        </div>
+
+        <!-- FP -->
+         <div class="bg-orange-500/10 border border-orange-500/20 p-3 rounded-lg flex flex-col items-center justify-center">
+            <span class="text-xs text-orange-200 uppercase font-bold tracking-wider mb-1">False Pos</span>
+            <span class="text-2xl font-black text-orange-400">{{ stats.fp }}</span>
+        </div>
+
+        <!-- TN -->
+        <div class="bg-blue-500/10 border border-blue-500/20 p-3 rounded-lg flex flex-col items-center justify-center">
+             <span class="text-xs text-blue-200 uppercase font-bold tracking-wider mb-1">True Neg</span>
+            <span class="text-2xl font-black text-blue-400">{{ stats.tn }}</span>
+        </div>
+    </div>
     <div class="p-4 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors group">
       <div class="flex justify-between items-end mb-1">
         <span class="text-sm font-bold text-white/80">Accuracy</span>

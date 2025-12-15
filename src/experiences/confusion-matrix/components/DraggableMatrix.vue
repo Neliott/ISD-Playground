@@ -104,7 +104,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div ref="containerRef" class="w-full h-full relative overflow-hidden bg-background">
+  <div ref="containerRef" class="w-full h-full relative overflow-hidden bg-background" :class="{ 'cursor-grabbing select-none': draggingId }">
       
      <!-- Zone Split Visuals -->
      <div class="absolute inset-0 flex pointer-events-none">
@@ -125,11 +125,11 @@ onUnmounted(() => {
         v-for="dot in dots" 
         :key="dot.id"
         class="absolute w-8 h-8 rounded-full shadow-lg border-2 cursor-grab active:cursor-grabbing hover:scale-110 flex items-center justify-center z-10 transition-transform duration-75 ease-out"
-        :class="dot.type === 'positive' ? 'bg-success border-success-200 shadow-success/40' : 'bg-accent border-accent-200 shadow-accent/40'"
+        :class="dot.type === 'positive' ? 'bg-blue-600 border-blue-700 shadow-blue-900/40 text-white' : 'bg-white border-slate-200 shadow-slate-200/50 text-blue-900'"
         :style="{ left: `${dot.x}px`, top: `${dot.y}px`, transform: 'translate(-50%, -50%)' }"
         @mousedown.stop="startDrag(dot, $event)"
       >
-        <span class="text-xs font-bold text-black/50 pointer-events-none select-none">
+        <span class="text-sm font-black pointer-events-none select-none">
           {{ dot.type === 'positive' ? '+' : '-' }}
         </span>
       </div>
