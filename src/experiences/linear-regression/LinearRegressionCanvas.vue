@@ -18,8 +18,8 @@ const canvasRef = ref(null)
 
 function resize() {
   if (!canvasRef.value) return
-  canvasRef.value.width = window.innerWidth
-  canvasRef.value.height = window.innerHeight
+  canvasRef.value.width = canvasRef.value.clientWidth
+  canvasRef.value.height = canvasRef.value.clientHeight
   draw()
 }
 

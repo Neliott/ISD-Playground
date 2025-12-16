@@ -85,7 +85,7 @@ reset()
   <div class="relative w-full h-screen overflow-hidden bg-black">
     
     <!-- Full Screen Visualization -->
-    <div class="absolute inset-0">
+    <div class="absolute inset-0 top-[35vh] md:top-0">
         <LossSurface 
             :path="path" 
             :f="f"
@@ -94,8 +94,9 @@ reset()
     </div>
 
     <!-- Floating Panel -->
-    <div class="absolute top-4 left-4 w-80 z-10">
-      <ExperiencePanel title="Gradient Descent">
+    <div class="absolute top-0 left-0 w-full h-[35vh] md:h-auto md:w-80 md:top-4 md:left-4 z-20 pointer-events-none p-4 pb-0 md:p-0 flex flex-col">
+      <div class="pointer-events-auto w-full h-full md:h-auto overflow-y-auto">
+        <ExperiencePanel title="Gradient Descent" class="h-full md:h-auto">
         <template #header>
            <div class="flex items-center gap-2">
             <BackToMenu />
@@ -135,7 +136,8 @@ reset()
             Click anywhere on the map to set a new starting point.
           </div>
 
-      </ExperiencePanel>
+        </ExperiencePanel>
+      </div>
     </div>
 
   </div>

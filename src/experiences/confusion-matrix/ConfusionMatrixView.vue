@@ -21,14 +21,14 @@ function updateStats(newStats) {
   <div class="relative w-full h-screen overflow-hidden bg-background font-sans">
       
     <!-- Full Screen Interaction Area -->
-    <div class="absolute inset-0 pt-0">
+    <div class="absolute inset-0 top-[40vh] md:top-0 pt-0">
         <DraggableMatrix @stats-update="updateStats" />
     </div>
 
     <!-- Floating Panel -->
-    <div class="absolute bottom-0 left-0 w-full md:top-4 md:left-4 md:bottom-auto md:w-80 z-20 pointer-events-none p-4 md:p-0">
-        <div class="pointer-events-auto max-h-[50vh] md:max-h-none overflow-y-auto">
-            <ExperiencePanel title="Confusion Matrix">
+    <div class="absolute top-0 left-0 w-full h-[40vh] md:h-auto md:w-80 md:top-4 md:left-4 md:bottom-auto z-20 pointer-events-none p-4 pb-0 md:p-0 flex flex-col">
+        <div class="pointer-events-auto w-full h-full md:h-auto overflow-y-auto">
+            <ExperiencePanel title="Confusion Matrix" class="h-full md:h-auto">
                 <template #header>
                     <div class="flex items-center gap-2">
                         <BackToMenu />

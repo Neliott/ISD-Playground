@@ -212,7 +212,7 @@ function trainLvq() {
 
 <template>
   <div class="relative w-full h-full overflow-hidden bg-background">
-    <div class="absolute inset-0 z-0">
+    <div class="absolute inset-0 top-[40vh] md:top-0 z-0">
       <KnnCanvas
         :points="points"
         :prototypes="prototypes"
@@ -227,8 +227,8 @@ function trainLvq() {
     </div>
     
     <!-- Controls Container -->
-    <div class="absolute top-4 left-4 bottom-4 w-80 z-10 flex flex-col pointer-events-none">
-      <div class="pointer-events-auto h-full">
+    <div class="absolute top-0 left-0 w-full h-[40vh] md:h-auto md:w-80 md:top-4 md:left-4 md:bottom-4 z-20 pointer-events-none p-4 pb-0 md:p-0 flex flex-col">
+      <div class="pointer-events-auto w-full h-full">
   <Controls
           v-model:k="k"
           v-model:selectedClass="selectedClass"
