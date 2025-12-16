@@ -26,8 +26,8 @@ function updateStats(newStats) {
     </div>
 
     <!-- Floating Panel -->
-    <div class="absolute top-4 left-4 w-80 z-20 pointer-events-none">
-        <div class="pointer-events-auto">
+    <div class="absolute bottom-0 left-0 w-full md:top-4 md:left-4 md:bottom-auto md:w-80 z-20 pointer-events-none p-4 md:p-0">
+        <div class="pointer-events-auto max-h-[50vh] md:max-h-none overflow-y-auto">
             <ExperiencePanel title="Confusion Matrix">
                 <template #header>
                     <div class="flex items-center gap-2">

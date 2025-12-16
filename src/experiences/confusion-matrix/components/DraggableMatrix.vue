@@ -5,6 +5,7 @@ const emit = defineEmits(['stats-update'])
 
 const dots = ref([])
 const containerRef = ref(null)
+const lastDimensions = ref({ w: 0, h: 0 })
 
 // Initial population
 function initDots() {
@@ -12,6 +13,9 @@ function initDots() {
   if (!containerRef.value) return 
   const w = containerRef.value.clientWidth
   const h = containerRef.value.clientHeight
+  
+  lastDimensions.value = { w, h }
+  
   
   // 10 Positives, 10 Negatives
   for (let i = 0; i < 10; i++) {
@@ -88,8 +92,30 @@ function calculateStats() {
 }
 
 function handleResize() {
-    // Ideally we re-scale dot positions, but for now just recalculating stats is enough
-    // ensuring no dots are lost off-screen would be better
+    if (!containerRef.value) return
+    
+    const w = containerRef.value.clientWidth
+    const h = containerRef.value.clientHeight
+    
+    // Avoid division by zero
+    if (lastDimensions.value.w === 0 || lastDimensions.value.h === 0) {
+        lastDimensions.value = { w, h }
+        return
+    }
+
+    const scaleX = w / lastDimensions.value.w
+    const scaleY = h / lastDimensions.value.h
+
+    dots.value.forEach(dot => {
+        dot.x = dot.x * scaleX
+        dot.y = dot.y * scaleY
+        
+        // Clamp to be safe
+        dot.x = Math.max(10, Math.min(w - 10, dot.x))
+        dot.y = Math.max(10, Math.min(h - 10, dot.y))
+    })
+
+    lastDimensions.value = { w, h }
     calculateStats()
 }
 
@@ -134,7 +160,7 @@ onUnmounted(() => {
         </span>
       </div>
       
-      <div class="absolute bottom-8 w-full text-center text-white/20 select-none pointer-events-none">
+      <div class="hidden md:block absolute bottom-8 w-full text-center text-white/20 select-none pointer-events-none">
           Left Side: Model predicts "YES" • Right Side: Model predicts "NO"
       </div>
   </div>
