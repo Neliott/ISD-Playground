@@ -109,7 +109,7 @@ const goToStep = (step) => {
           </div>
 
           <!-- Bottom Navigation -->
-          <div class="p-6 border-t border-white/5 bg-black/20 flex justify-between items-center sticky bottom-0 backdrop-blur-sm">
+          <div class="p-3 gap-4 border-t border-white/5 bg-black/20 flex justify-between items-center sticky bottom-0 backdrop-blur-sm">
             <Button 
                 variant="secondary"
                 :disabled="!prevStep"
