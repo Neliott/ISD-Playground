@@ -1,6 +1,6 @@
 <script setup>
 import ExperiencePanel from '../../components/ExperiencePanel.vue'
-import BackToMenu from '../../components/BackToMenu.vue'
+
 import Tooltip from '../../components/Tooltip.vue'
 import ControlBox from '../../components/controls/ControlBox.vue'
 import Toggle from '../../components/controls/Toggle.vue'
@@ -60,24 +60,31 @@ defineProps({
   lvqK: {
     type: Number,
     default: 1
+  },
+  isEmbedded: {
+    type: Boolean,
+    default: false
   }
 })
 
-defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'update:resolveTies', 'update:prototypesPerClass', 'update:lvqInitMode', 'update:distanceMetric', 'update:distanceWeighting', 'update:learningRate', 'update:trainEpochs', 'update:lvqK', 'clear', 'init-lvq', 'train-lvq', 'explain'])
+defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'update:resolveTies', 'update:prototypesPerClass', 'update:lvqInitMode', 'update:distanceMetric', 'update:distanceWeighting', 'update:learningRate', 'update:trainEpochs', 'update:lvqK', 'clear', 'init-lvq', 'train-lvq', 'go-back', 'start-course', 'full-screen'])
+
 </script>
 
 <template>
   <ExperiencePanel title="kNN Visualization" class="h-full overflow-y-auto pointer-events-auto">
     <template #header>
       <div class="flex items-center gap-2">
-        <BackToMenu />
-        <div class="flex-1"></div>
         <button 
-          @click="$emit('explain')"
-          class="text-xs text-text-muted hover:text-white underline transition-colors"
+          v-if="!isEmbedded"
+          @click="$emit('go-back')"
+          class="text-sm text-text-muted hover:text-text transition-colors flex items-center gap-1"
         >
-          How it works?
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          Back
         </button>
+        <h2 v-else class="text-sm font-bold text-white uppercase tracking-wider">Playground</h2>
+        <div class="flex-1"></div>
       </div>
     </template>
 
@@ -85,6 +92,26 @@ defineEmits(['update:k', 'update:selectedClass', 'update:showLvq', 'update:resol
       
       <div class="text-sm text-white/60 font-light">
         Click to add points.
+      </div>
+
+      <div class="flex flex-col gap-2">
+          <button 
+            v-if="!isEmbedded"
+            @click="$emit('start-course')"
+            class="w-full py-2 px-3 rounded bg-primary-500/10 border border-primary-500/20 text-primary-400 text-xs font-bold uppercase tracking-wider hover:bg-primary-500/20 transition-colors flex items-center justify-center gap-2"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+            Start Course
+          </button>
+          
+          <button 
+            v-if="isEmbedded"
+            @click="$emit('full-screen')"
+            class="w-full py-2 px-3 rounded bg-white/5 border border-white/10 text-text-muted text-xs font-bold uppercase tracking-wider hover:bg-white/10 hover:text-white transition-colors flex items-center justify-center gap-2"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path></svg>
+            Full Screen
+          </button>
       </div>
 
     <!-- Mode Switcher -->

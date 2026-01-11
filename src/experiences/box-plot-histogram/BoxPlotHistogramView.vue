@@ -1,12 +1,34 @@
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import BoxPlot from './components/BoxPlot.vue'
 import Histogram from './components/Histogram.vue'
 import DataControl from './components/DataControl.vue'
 import ExperiencePanel from '../../components/ExperiencePanel.vue'
-import BackToMenu from '../../components/BackToMenu.vue'
 import Tooltip from '../../components/Tooltip.vue'
 import VisualDistribution from '../../components/visuals/VisualDistribution.vue'
+
+const props = defineProps({
+  isEmbedded: {
+    type: Boolean,
+    default: false
+  }
+})
+
+const router = useRouter()
+
+function goToCourse() {
+    router.push('/learn/box-plot-histogram/intro')
+}
+
+function goToFullScreen() {
+    router.push('/box-plot-histogram')
+}
+
+function goBack() {
+    router.back()
+}
+
 
 // Initial data
 const dataPoints = ref([10, 20, 25, 30, 40, 45, 45, 50, 50, 50, 55, 60, 65, 70, 80, 90])
@@ -72,7 +94,32 @@ function updateData(newData) {
 
     <!-- Header / Nav (Minimal) -->
     <div class="absolute top-4 left-4 z-50 flex items-center gap-4">
-        <BackToMenu />
+        <button 
+            v-if="!isEmbedded"
+            @click="goBack"
+            class="flex items-center gap-2 px-3 py-1.5 bg-surface/50 hover:bg-surface border border-white/10 rounded-full transition-all text-xs font-bold text-text-muted hover:text-white backdrop-blur-md group"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+            <span>Back</span>
+        </button>
+
+        <button 
+              v-if="!isEmbedded"
+              @click="goToCourse"
+              class="flex items-center gap-2 px-3 py-1.5 bg-primary-500/10 hover:bg-primary-500/20 border border-primary-500/20 rounded-full transition-all text-xs font-bold text-primary-400 backdrop-blur-md group"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+              Start Course
+        </button>
+            
+        <button 
+              v-if="isEmbedded"
+              @click="goToFullScreen"
+              class="flex items-center gap-2 px-3 py-1.5 bg-surface/50 hover:bg-surface border border-white/10 rounded-full transition-all text-xs font-bold text-text-muted hover:text-white backdrop-blur-md group"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path></svg>
+              Full Screen
+        </button>
         
         <!-- Info Button -->
         <button @click="showInfo = true" class="flex items-center gap-2 px-3 py-1.5 bg-surface/50 hover:bg-surface border border-white/10 rounded-full transition-all text-xs font-bold text-accent-100 backdrop-blur-md group">

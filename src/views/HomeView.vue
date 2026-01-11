@@ -1,5 +1,6 @@
 <script setup>
 import { useRouter } from 'vue-router'
+import { courses } from '../data/courses.js'
 
 const router = useRouter()
 
@@ -131,45 +132,42 @@ function handleMouseMove(e) {
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div 
+                v-for="course in courses"
+                :key="course.id"
                 class="group relative bg-gradient-to-br from-white/10 to-white/5 border border-white/10 rounded-3xl cursor-pointer transition-all duration-300 hover:-translate-y-2 hover:border-primary-500/50 overflow-hidden"
-                @click="navigateTo('/learn/linear-regression/intro')"
+                @click="navigateTo(`/learn/${course.id}/intro`)"
             >
                 <div class="h-48 bg-black/30 w-full relative overflow-hidden">
                     <!-- Preview Visual (simplified pattern) -->
                     <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik00MCAwTDAsMHY0MGg0MFowIiBmaWxsPSJub25lIiBzdHJva2U9InJnYmEoMjU1LDI1NSwyNTUsMC4wNSkiIHN0cm9rZS13aWR0aD0iMSIvPgo8L3N2Zz4=')] opacity-50"></div>
                      <div class="absolute inset-0 flex items-center justify-center">
-                         <span class="text-4xl">📈</span>
+                         <span class="text-4xl">
+                            {{ 
+                                course.id === 'linear-regression' ? '📈' : 
+                                course.id === 'knn-lvq' ? '🎯' : 
+                                course.id === 'gradient-descent' ? '🏔️' : 
+                                course.id === 'confusion-matrix' ? '⚖️' : 
+                                course.id === 'box-plot-histogram' ? '📊' : '🎓'
+                            }}
+                         </span>
                      </div>
                 </div>
                 
                 <div class="p-8">
                     <div class="flex items-center gap-2 mb-4">
                         <span class="px-2 py-1 rounded text-[10px] uppercase font-bold bg-primary-500/20 text-primary-400 border border-primary-500/20">Course</span>
-                        <span class="text-xs text-text-muted">7 Lessons</span>
+                        <span class="text-xs text-text-muted">{{ course.steps.length }} Sections</span>
                     </div>
                     
-                    <h3 class="text-2xl font-bold text-white mb-2">Linear Regression</h3>
+                    <h3 class="text-2xl font-bold text-white mb-2">{{ course.title }}</h3>
                     <p class="text-sm text-text-muted mb-6">
-                        Start from zero. Understanding the math behind the simplest ML algorithm through interactive visualizations.
+                        {{ course.description }}
                     </p>
                     
                     <div class="flex items-center text-primary-400 text-sm font-bold group-hover:underline">
                         Start Learning →
                     </div>
                 </div>
-            </div>
-            
-            <!-- Placeholder for future courses -->
-            <div class="relative bg-white/5 border border-white/5 rounded-3xl p-8 flex flex-col items-center justify-center text-center opacity-50 border-dashed">
-                <div class="text-4xl mb-4 grayscale">🎯</div>
-                <h3 class="text-xl font-bold text-white mb-2">KNN & Classification</h3>
-                <p class="text-xs text-text-muted">Coming soon</p>
-            </div>
-            
-            <div class="relative bg-white/5 border border-white/5 rounded-3xl p-8 flex flex-col items-center justify-center text-center opacity-50 border-dashed">
-                <div class="text-4xl mb-4 grayscale">🏔️</div>
-                <h3 class="text-xl font-bold text-white mb-2">Gradient Descent</h3>
-                <p class="text-xs text-text-muted">Coming soon</p>
             </div>
         </div>
     </section>

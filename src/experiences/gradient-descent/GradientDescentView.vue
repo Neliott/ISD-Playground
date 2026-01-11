@@ -1,10 +1,30 @@
 <script setup>
 import { ref, computed, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import LossSurface from './components/LossSurface.vue'
 import DescentControls from './components/DescentControls.vue'
 import ExperiencePanel from '../../components/ExperiencePanel.vue'
-import BackToMenu from '../../components/BackToMenu.vue'
-import ExplanationOverlay from '../../components/ExplanationOverlay.vue' // Optional but good to have ready
+
+const props = defineProps({
+  isEmbedded: {
+    type: Boolean,
+    default: false
+  }
+})
+
+const router = useRouter()
+
+function goToCourse() {
+    router.push('/learn/gradient-descent/intro')
+}
+
+function goToFullScreen() {
+    router.push('/gradient-descent')
+}
+
+function goBack() {
+    router.back()
+}
 
 // ---------- Optimization Logic ----------
 
@@ -99,10 +119,39 @@ reset()
         <ExperiencePanel title="Gradient Descent" class="h-full md:h-auto">
         <template #header>
            <div class="flex items-center gap-2">
-            <BackToMenu />
+            <button 
+              v-if="!isEmbedded"
+              @click="goBack"
+              class="text-sm text-text-muted hover:text-text transition-colors flex items-center gap-1"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+              Back
+            </button>
+            <h2 v-else class="text-sm font-bold text-white uppercase tracking-wider">Playground</h2>
             <div class="flex-1"></div>
           </div>
         </template>
+
+        <div class="mb-6 flex flex-col gap-2">
+            <button 
+              v-if="!isEmbedded"
+              @click="goToCourse"
+              class="w-full py-2 px-3 rounded bg-primary-500/10 border border-primary-500/20 text-primary-400 text-xs font-bold uppercase tracking-wider hover:bg-primary-500/20 transition-colors flex items-center justify-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+              Start Course
+            </button>
+            
+            <button 
+              v-if="isEmbedded"
+              @click="goToFullScreen"
+              class="w-full py-2 px-3 rounded bg-white/5 border border-white/10 text-text-muted text-xs font-bold uppercase tracking-wider hover:bg-white/10 hover:text-white transition-colors flex items-center justify-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path></svg>
+              Full Screen
+            </button>
+        </div>
+
 
         <div class="mb-6 text-sm text-text-muted">
            Visualize how optimization algorithms "walk down the hill" to minimize loss.
