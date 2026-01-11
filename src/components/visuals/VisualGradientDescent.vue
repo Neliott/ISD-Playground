@@ -22,6 +22,7 @@ onMounted(() => {
   let ballX = w * 0.1
   let ballY = getCurveY(ballX)
   let velocity = 0
+  let isResetting = false
   
   const animate = () => {
     ctx.clearRect(0, 0, w, h)
@@ -51,10 +52,12 @@ onMounted(() => {
     ballY = getCurveY(ballX)
     
     // Reset if it converges closely or goes out (loop)
-    if (Math.abs(ballX - centerX) < 2) {
+    if (Math.abs(ballX - centerX) < 2 && !isResetting) {
+       isResetting = true
        setTimeout(() => {
            ballX = w * 0.1
            // Flash effect?
+           isResetting = false
        }, 2000)
     }
     
