@@ -196,17 +196,17 @@ onUnmounted(() => cancelAnimationFrame(animationId))
 </script>
 
 <template>
-  <div class="w-full h-full flex flex-row bg-slate-900 rounded-lg overflow-hidden border border-slate-700">
-      <!-- LEFT: Data Space -->
-      <div class="w-1/2 h-full relative border-r border-slate-700">
+  <div class="w-full h-full flex flex-col bg-slate-900 rounded-lg overflow-hidden border border-slate-700">
+      <!-- TOP: Data Space -->
+      <div class="w-full h-1/2 relative border-b border-slate-700">
           <canvas ref="canvasLeft" class="w-full h-full block"></canvas>
           <div class="absolute top-2 left-2 bg-black/40 p-1 px-2 rounded text-xs text-white">
               Data Space (Line Fitting)
           </div>
       </div>
       
-      <!-- RIGHT: Parameter Space (Three.js) -->
-      <div class="w-1/2 h-full relative">
+      <!-- BOTTOM: Parameter Space (Three.js) -->
+      <div class="w-full h-1/2 relative">
            <ThreeScene 
                 :cameraPosition="{ x: 3, y: 4, z: 4 }"
                 @init="initThree"

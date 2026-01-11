@@ -118,7 +118,8 @@ export const courses = [
                     </ul>
                 `,
                 component: VisualCostFunction,
-                props: { step: 'surface' }
+                props: { step: 'surface' },
+                layout: 'fullscreen'
             },
             {
                 id: 'cost-function-viz',
@@ -130,7 +131,8 @@ export const courses = [
                     <p class="text-sm text-text-muted">Every point on this surface represents a different line. The lowest point is the "Best Fit Line".</p>
                 `,
                 component: VisualCostFunction,
-                props: { step: 'min' }
+                props: { step: 'min' },
+                layout: 'fullscreen'
             },
             {
                 id: 'gd-math-details',
@@ -145,7 +147,8 @@ export const courses = [
                     <p class="text-sm text-text-muted">Interactive: Watch the yellow ball roll down to the global minimum.</p>
                 `,
                 component: VisualCostFunction,
-                props: { step: 'gradient' }
+                props: { step: 'gradient' },
+                layout: 'fullscreen'
             },
             {
                 id: 'overfitting',

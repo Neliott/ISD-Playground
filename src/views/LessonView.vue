@@ -123,8 +123,13 @@ const goToStep = (step) => {
 
             <!-- Visual Component -->
             <transition name="scale-fade" mode="out-in">
-                <div :key="currentStep.id" class="relative z-10 w-full max-w-2xl aspect-square flex items-center justify-center p-8">
-                    <div v-if="currentStep.component" class="w-full h-full rounded-xl overflow-hidden border border-white/10 shadow-2xl bg-surface/50 backdrop-blur-sm">
+                <div :key="currentStep.id" 
+                     class="relative z-10 w-full flex items-center justify-center transition-all duration-500"
+                     :class="currentStep.layout === 'fullscreen' ? 'h-full p-0' : 'max-w-2xl aspect-square p-8'">
+                     
+                    <div v-if="currentStep.component" 
+                         class="w-full h-full overflow-hidden transition-all duration-500"
+                         :class="currentStep.layout === 'fullscreen' ? '' : 'rounded-xl border border-white/10 shadow-2xl bg-surface/50 backdrop-blur-sm'">
                         <component :is="currentStep.component" v-bind="currentStep.props || {}" />
                     </div>
                     <div v-else class="text-white/20">
