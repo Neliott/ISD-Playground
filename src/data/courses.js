@@ -16,6 +16,8 @@ import ConfusionMatrixView from '../experiences/confusion-matrix/ConfusionMatrix
 import BoxPlotHistogramView from '../experiences/box-plot-histogram/BoxPlotHistogramView.vue'
 import VisualDistribution from '../components/visuals/VisualDistribution.vue'
 import VisualLvqStep from '../components/visuals/VisualLvqStep.vue'
+import VisualCostFunction from '../components/visuals/VisualCostFunction.vue'
+
 
 export const courses = [
     {
@@ -100,6 +102,52 @@ export const courses = [
                 `
             },
             {
+                id: 'cost-function-intro',
+                type: 'concept',
+                title: 'The Cost Function J(θ)',
+                content: `
+                    <p class="mb-4">How do we define "Error" mathematically?</p>
+                    <div class="p-4 bg-white/5 border border-white/10 rounded-lg text-center mb-4">
+                        <code class="text-xl text-yellow-400">MSE = (1/n) * Σ(y - ŷ)²</code>
+                        <p class="text-xs text-text-muted mt-2">Sum of Squared Errors averaged.</p>
+                    </div>
+                    <p>We square the errors so that:</p>
+                    <ul class="list-disc pl-5 text-sm text-text-muted">
+                        <li>Negatives become positives.</li>
+                        <li>Larger errors are punished more severely (outliers matter!).</li>
+                    </ul>
+                `,
+                component: VisualCostFunction,
+                props: { step: 'surface' }
+            },
+            {
+                id: 'cost-function-viz',
+                type: 'concept',
+                title: 'The Valley of Loss',
+                content: `
+                    <p class="mb-4">If we plot the Error for every possible line (m, b), we get a 3D bowl shape.</p>
+                    <p class="mb-4"><strong>The Goal:</strong> Find the bottom of this bowl.</p>
+                    <p class="text-sm text-text-muted">Every point on this surface represents a different line. The lowest point is the "Best Fit Line".</p>
+                `,
+                component: VisualCostFunction,
+                props: { step: 'min' }
+            },
+            {
+                id: 'gd-learning-rate',
+                type: 'concept',
+                title: 'Gradient Descent: The Math',
+                content: `
+                    <p class="mb-4">The gradient tells us the "steepest" direction uphill.</p>
+                    <p class="mb-4">So we subtract it to go downhill:</p>
+                    <div class="p-4 bg-white/5 rounded text-center font-mono text-sm mb-4">
+                        θ_new = θ_old - (Lr * Gradient)
+                    </div>
+                    <p class="text-sm text-text-muted">Interactive: Watch the yellow ball roll down to the global minimum.</p>
+                `,
+                component: VisualCostFunction,
+                props: { step: 'gradient' }
+            },
+            {
                 id: 'overfitting',
                 type: 'concept',
                 title: 'The Danger of Complexity',
@@ -124,6 +172,34 @@ export const courses = [
           </ul>
         `,
                 component: VisualCorrelation
+            },
+            {
+                id: 'r-squared',
+                type: 'concept',
+                title: 'R-Squared (R²)',
+                content: `
+                    <p class="mb-4">Correlation is good, but <strong>Coefficient of Determination ($R^2$)</strong> is better for regression.</p>
+                    <p class="mb-4">It represents the <em>percentage of variance explained</em> by the model.</p>
+                    <ul class="list-disc pl-5 space-y-2 text-sm text-text-muted">
+                        <li><strong>0.0</strong>: Model explains nothing (just guessing the mean).</li>
+                        <li><strong>1.0</strong>: Model explains everything (perfect fit).</li>
+                    </ul>
+                `,
+                component: VisualResiduals
+            },
+            {
+                id: 'assumptions',
+                type: 'concept',
+                title: 'The 4 Assumptions',
+                content: `
+                    <p class="mb-4">Linear Regression is powerful, but only if:</p>
+                    <ol class="list-decimal pl-5 space-y-2 text-sm text-text-muted mb-4">
+                        <li><strong>Linearity</strong>: The relationship is actually a line.</li>
+                        <li><strong>Independence</strong>: Data points don't influence each other.</li>
+                        <li><strong>Homoscedasticity</strong>: The error spread is constant (no "cone" shapes).</li>
+                        <li><strong>Normality</strong>: Residuals are normally distributed.</li>
+                    </ol>
+                `
             },
             {
                 id: 'quiz',
@@ -181,6 +257,56 @@ export const courses = [
                                 { id: 'c', text: "The model stops learning instantly", isCorrect: false }
                             ],
                             explanation: "A very high learning rate causes the updates to be too large, potentially bouncing back and forth or even moving further away from the minimum."
+                        },
+                        {
+                            id: 6,
+                            question: "What is the goal of the Cost Function (J)?",
+                            options: [
+                                { id: 'a', text: "To maximize the error so we learn more", isCorrect: false },
+                                { id: 'b', text: "To quantify how 'bad' our model is (so we can minimize it)", isCorrect: true },
+                                { id: 'c', text: "To calculate the slope of the line directly", isCorrect: false }
+                            ],
+                            explanation: "The Cost Function (MSE) measures the average squared difference between predictions and reality. Our goal is to make this number 0 (or as low as possible)."
+                        },
+                        {
+                            id: 7,
+                            question: "What does an R-Squared (R²) of 0.90 mean?",
+                            options: [
+                                { id: 'a', text: "The model is 90% accurate", isCorrect: false },
+                                { id: 'b', text: "The model explains 90% of the variance in the data", isCorrect: true },
+                                { id: 'c', text: "The correlation is negative", isCorrect: false }
+                            ],
+                            explanation: "R-Squared represents the proportion of variance in the dependent variable that can be explained by the independent variable."
+                        },
+                        {
+                            id: 8,
+                            question: "Which assumption is violated if your error residuals form a 'cone' shape?",
+                            options: [
+                                { id: 'a', text: "Linearity", isCorrect: false },
+                                { id: 'b', text: "Independence", isCorrect: false },
+                                { id: 'c', text: "Homoscedasticity", isCorrect: true }
+                            ],
+                            explanation: "Homoscedasticity requires constant variance. A cone shape means errors get larger (or smaller) as X increases, violating this assumption."
+                        },
+                        {
+                            id: 9,
+                            question: "In Gradient Descent, what happens if the Learning Rate is too BIG?",
+                            options: [
+                                { id: 'a', text: "It converges instantly", isCorrect: false },
+                                { id: 'b', text: "It overshoots the minimum and may diverge (fail)", isCorrect: true },
+                                { id: 'c', text: "It stops exactly at the bottom", isCorrect: false }
+                            ],
+                            explanation: "A large learning rate causes the algorithm to take massive steps, potentially jumping *over* the valley floor and landing higher up on the other side."
+                        },
+                        {
+                            id: 10,
+                            question: "Why do we SQUARE the errors in MSE?",
+                            options: [
+                                { id: 'a', text: "To make the numbers smaller", isCorrect: false },
+                                { id: 'b', text: "To ensure all errors are negative", isCorrect: false },
+                                { id: 'c', text: "To make sure errors are positive and punish outliers", isCorrect: true }
+                            ],
+                            explanation: "Squaring eliminates negatives (so they don't cancel out) and applies a penalty that grows exponentially with error size."
                         }
                     ]
                 }
