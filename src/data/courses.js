@@ -20,6 +20,9 @@ import VisualCostFunction from '../components/visuals/VisualCostFunction.vue'
 import VisualDataTypes from '../experiences/data-characteristics/VisualDataTypes.vue'
 import VisualFeatureEngineering from '../experiences/data-characteristics/VisualFeatureEngineering.vue'
 import VisualDataQuality from '../experiences/data-characteristics/VisualDataQuality.vue'
+import VisualKMeans from '../experiences/clustering/VisualKMeans.vue'
+import VisualElbowMethod from '../experiences/clustering/VisualElbowMethod.vue'
+import VisualImageQuantization from '../experiences/clustering/VisualImageQuantization.vue'
 
 
 export const courses = [
@@ -856,6 +859,120 @@ export const courses = [
                                 { id: 'c', text: "To encrypt the data", isCorrect: false }
                             ],
                             explanation: "Feature engineering creates representations of data that better expose the underlying patterns to the learning algorithm."
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        id: 'unsupervised-learning',
+        title: 'Unsupervised Learning',
+        description: 'Discovering hidden structures in unlabeled data. K-Means and beyond.',
+        steps: [
+            {
+                id: 'intro',
+                type: 'concept',
+                title: 'No Teacher, No Labels',
+                content: `
+                    <p class="text-xl text-white mb-6">"What if we don't know the answer?"</p>
+                    <p class="mb-4">In Supervised Learning, we had labels (Right/Wrong). In <strong>Unsupervised Learning</strong>, the data is unlabeled.</p>
+                    <p>The goal is to find hidden structures, patterns, or groups within the chaotic data.</p>
+                `
+            },
+            {
+                id: 'kmeans-intro',
+                type: 'concept',
+                title: 'K-Means Clustering',
+                content: `
+                    <p class="mb-4">The most popular algorithm is <strong>K-Means</strong>.</p>
+                    <p class="mb-4">It tries to group data into <strong>K</strong> clusters, where each cluster is represented by a prototype (Centroid).</p>
+                    <p class="text-sm text-text-muted">Algorithm: Assign points to nearest centroid -> Move centroid to center -> Repeat.</p>
+                `,
+                component: VisualKMeans,
+                props: { isEmbedded: true },
+                layout: 'fullscreen'
+            },
+            {
+                id: 'init-problem',
+                type: 'concept',
+                title: 'The Initialization Problem',
+                content: `
+                    <p class="mb-4">Standard K-Means picks initial centroids randomly. This can be disastrous.</p>
+                    <p class="mb-4"><strong>K-Means++</strong> is a smarter initialization: it picks centers that are far apart from each other.</p>
+                    <p class="text-sm text-text-muted">Try using "Random" initialization in the visual above and hit "Reset Data" a few times. Sometimes it fails to find the correct clusters!</p>
+                `
+            },
+            {
+                id: 'elbow-method',
+                type: 'concept',
+                title: 'Choosing K (Elbow Method)',
+                content: `
+                    <p class="mb-4">How many clusters should we look for? 3? 5? 10?</p>
+                    <p class="mb-4">We calculate the total error (WSS) for different K. </p>
+                    <p class="mb-4">We look for the <strong>Elbow Point</strong>: the spot where adding more clusters stops giving us big gains.</p>
+                `,
+                component: VisualElbowMethod,
+                layout: 'fullscreen'
+            },
+            {
+                id: 'image-quantization',
+                type: 'concept',
+                title: 'Application: Image Compression',
+                content: `
+                    <p class="mb-4">We can use K-Means to compress images.</p>
+                    <p class="mb-4">By finding the "K best colors" to represent an image, we can throw away the thousands of other colors.</p>
+                    <p class="text-sm text-text-muted">This is called Vector Quantization.</p>
+                `,
+                component: VisualImageQuantization,
+                layout: 'fullscreen'
+            },
+            {
+                id: 'quiz',
+                type: 'quiz',
+                title: 'Knowledge Check',
+                component: QuizView,
+                props: {
+                    questions: [
+                        {
+                            id: 1,
+                            question: "What is the main difference between Supervised and Unsupervised learning?",
+                            options: [
+                                { id: 'a', text: "Unsupervised learning uses labeled data", isCorrect: false },
+                                { id: 'b', text: "Unsupervised learning uses unlabeled data", isCorrect: true },
+                                { id: 'c', text: "Unsupervised learning is faster", isCorrect: false }
+                            ],
+                            explanation: "Unsupervised learning works on data without target labels, trying to find structure on its own."
+                        },
+                        {
+                            id: 2,
+                            question: "What is a 'Centroid' in K-Means?",
+                            options: [
+                                { id: 'a', text: "The outlier point", isCorrect: false },
+                                { id: 'b', text: "The center of a cluster", isCorrect: true },
+                                { id: 'c', text: "The starting point", isCorrect: false }
+                            ],
+                            explanation: "Each cluster is defined by its center point, called the Centroid."
+                        },
+                        {
+                            id: 3,
+                            question: "What problem does K-Means++ solve?",
+                            options: [
+                                { id: 'a', text: "It makes the algorithm faster per iteration", isCorrect: false },
+                                { id: 'b', text: "It picks better initial centroids to avoid bad results", isCorrect: true },
+                                { id: 'c', text: "It automatically determines the best K", isCorrect: false }
+                            ],
+                            explanation: "K-Means++ improves the initialization step by spreading out the initial centroids, which helps the algorithm converge to a better solution."
+                        },
+                        {
+                            id: 4,
+                            question: "In the Elbow Method, what are we looking for?",
+                            options: [
+                                { id: 'a', text: "The point where error becomes zero", isCorrect: false },
+                                { id: 'b', text: "The point of diminishing returns (the bend)", isCorrect: true },
+                                { id: 'c', text: "The highest point on the graph", isCorrect: false }
+                            ],
+                            explanation: "We look for the 'elbow' where the reduction in error slows down significantly. This is usually the optimal tradeoff between simplicity (low K) and accuracy."
                         }
                     ]
                 }
