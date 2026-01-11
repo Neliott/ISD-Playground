@@ -68,19 +68,35 @@ export const courses = [
                 component: VisualResiduals
             },
             {
-                id: 'gradient-descent',
+                id: 'gd-intro',
                 type: 'concept',
-                title: 'How It Learns',
+                title: 'The Valley of Loss',
                 content: `
-          <p class="mb-4">Imagine a blindfolded hiker trying to find a valley's bottom.</p>
-          <p class="mb-4">This process is called <strong>Gradient Descent</strong>.</p>
-          <ul class="list-disc pl-5 space-y-2 text-sm text-text-muted">
-            <li>The 'Ball' is our model's parameters.</li>
-            <li>The 'Hill' is the total error.</li>
-            <li>We take small steps downhill until we stop moving.</li>
-          </ul>
-        `,
+                    <p class="text-xl text-white mb-6">Learning is just finding the lowest point.</p>
+                    <p class="mb-4">Imagine you are on a mountain at night (blindfolded). You want to go down to the village.</p>
+                    <p>You feel the slope of the ground under your feet and take a step downhill.</p>
+                `,
                 component: VisualGradientDescent
+            },
+            {
+                id: 'gd-playground',
+                type: 'experiment',
+                title: 'Gradient Descent',
+                content: 'Explore the gradient landscape.',
+                component: GradientDescentView,
+                props: { isEmbedded: true }
+            },
+            {
+                id: 'gd-learning-rate',
+                type: 'concept',
+                title: 'Learning Rate (Step Size)',
+                content: `
+                    <p class="mb-4">How big of a step should you take?</p>
+                    <ul class="list-disc pl-5 space-y-2 mb-4 text-sm text-text-muted">
+                        <li><strong>Too Small</strong>: It takes forever to reach the bottom.</li>
+                        <li><strong>Too Big</strong>: You might overshoot and jump to the other side of the valley!</li>
+                    </ul>
+                `
             },
             {
                 id: 'overfitting',
@@ -144,6 +160,26 @@ export const courses = [
                                 { id: 'c', text: "When the model runs too slowly", isCorrect: false }
                             ],
                             explanation: "Overfitting happens when a model is too complex and learns the random noise in the training data rather than the underlying pattern."
+                        },
+                        {
+                            id: 4,
+                            question: "What does the Gradient represent?",
+                            options: [
+                                { id: 'a', text: "The height of the mountain", isCorrect: false },
+                                { id: 'b', text: "The direction of steepest ascent", isCorrect: true },
+                                { id: 'c', text: "The distance to the goal", isCorrect: false }
+                            ],
+                            explanation: "The gradient points uphill. We move in the opposite direction (descent) to minimize loss."
+                        },
+                        {
+                            id: 5,
+                            question: "What happens if the Learning Rate is too high?",
+                            options: [
+                                { id: 'a', text: "We reach the minimum faster", isCorrect: false },
+                                { id: 'b', text: "We might overshoot and diverge", isCorrect: true },
+                                { id: 'c', text: "The model stops learning instantly", isCorrect: false }
+                            ],
+                            explanation: "A very high learning rate causes the updates to be too large, potentially bouncing back and forth or even moving further away from the minimum."
                         }
                     ]
                 }
@@ -282,74 +318,7 @@ export const courses = [
             }
         ]
     },
-    {
-        id: 'gradient-descent',
-        title: 'Gradient Descent',
-        description: 'How machines learn by sliding down hills.',
-        steps: [
-            {
-                id: 'intro',
-                type: 'concept',
-                title: 'The Valley of Loss',
-                content: `
-                    <p class="text-xl text-white mb-6">Learning is just finding the lowest point.</p>
-                    <p class="mb-4">Imagine you are on a mountain at night (blindfolded). You want to go down to the village.</p>
-                    <p>You feel the slope of the ground under your feet and take a step downhill.</p>
-                `,
-                component: VisualGradientDescent
-            },
-            {
-                id: 'playground',
-                type: 'experiment',
-                title: 'Interactive Surface',
-                content: 'Explore the gradient landscape.',
-                component: GradientDescentView,
-                props: { isEmbedded: true }
-            },
-            {
-                id: 'learning-rate',
-                type: 'concept',
-                title: 'Learning Rate (Step Size)',
-                content: `
-                    <p class="mb-4">How big of a step should you take?</p>
-                    <ul class="list-disc pl-5 space-y-2 mb-4 text-sm text-text-muted">
-                        <li><strong>Too Small</strong>: It takes forever to reach the bottom.</li>
-                        <li><strong>Too Big</strong>: You might overshoot and jump to the other side of the valley!</li>
-                    </ul>
-                `
-            },
-            {
-                id: 'quiz',
-                type: 'quiz',
-                title: 'Knowledge Check',
-                component: QuizView,
-                props: {
-                    questions: [
-                        {
-                            id: 1,
-                            question: "What does the Gradient represent?",
-                            options: [
-                                { id: 'a', text: "The height of the mountain", isCorrect: false },
-                                { id: 'b', text: "The direction of steepest ascent", isCorrect: true },
-                                { id: 'c', text: "The distance to the goal", isCorrect: false }
-                            ],
-                            explanation: "The gradient points uphill. We move in the opposite direction (descent) to minimize loss."
-                        },
-                        {
-                            id: 2,
-                            question: "What happens if the Learning Rate is too high?",
-                            options: [
-                                { id: 'a', text: "We reach the minimum faster", isCorrect: false },
-                                { id: 'b', text: "We might overshoot and diverge", isCorrect: true },
-                                { id: 'c', text: "The model stops learning instantly", isCorrect: false }
-                            ],
-                            explanation: "A very high learning rate causes the updates to be too large, potentially bouncing back and forth or even moving further away from the minimum."
-                        }
-                    ]
-                }
-            }
-        ]
-    },
+
     {
         id: 'confusion-matrix',
         title: 'Confusion Matrix',
