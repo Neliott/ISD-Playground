@@ -15,6 +15,7 @@ import GradientDescentView from '../experiences/gradient-descent/GradientDescent
 import ConfusionMatrixView from '../experiences/confusion-matrix/ConfusionMatrixView.vue'
 import BoxPlotHistogramView from '../experiences/box-plot-histogram/BoxPlotHistogramView.vue'
 import VisualDistribution from '../components/visuals/VisualDistribution.vue'
+import VisualLvqStep from '../components/visuals/VisualLvqStep.vue'
 
 export const courses = [
     {
@@ -248,33 +249,124 @@ export const courses = [
                 component: VisualKEffect
             },
             {
-                id: 'lvq-intro',
+                id: 'weighted-knn',
                 type: 'concept',
-                title: 'Switching to LVQ',
+                title: 'Weighted k-NN',
                 content: `
-            <p class="mb-4">k-NN is slow if you have millions of points. You have to measure distance to ALL of them.</p>
-            <p class="mb-4"><strong>Learning Vector Quantization (LVQ)</strong> solves this by using "Prototypes".</p>
-            <p>We only keep a few points per class. These prototypes move to represent the data.</p>
-          `
+                    <p class="mb-4">Standard k-NN treats all neighbors equally (Democracy).</p>
+                    <p class="mb-4"><strong>Weighted k-NN</strong> values closer neighbors more.</p>
+                    <div class="p-4 bg-white/5 border border-white/10 rounded-lg text-sm mb-4">
+                        <p class="mb-2"><strong>Weight Formula:</strong> Weight = 1 / Distance</p>
+                        <p class="text-text-muted">A neighbor at distance 0.1 has a weight of 10. A neighbor at distance 10 has a weight of 0.1.</p>
+                    </div>
+                    <p>The prediction is based on the class with the highest <strong>Total Weight</strong>, not just the most votes.</p>
+                `,
+                component: VisualKnnVoting
             },
             {
-                id: 'lvq-dynamics',
+                id: 'real-model',
                 type: 'concept',
-                title: 'LVQ Training Dynamics',
+                title: 'Towards a Real Model',
                 content: `
-            <p class="mb-4">Prototypes learn by moving based on feedback:</p>
-            <div class="grid grid-cols-2 gap-4 text-sm">
-              <div class="p-3 bg-green-500/10 border border-green-500/20 rounded">
-                <strong class="text-green-400 block mb-1">Attraction</strong>
-                If nearest prototype is CORRECT class -> Move Closer.
-              </div>
-              <div class="p-3 bg-red-500/10 border border-red-500/20 rounded">
-                <strong class="text-red-400 block mb-1">Repulsion</strong>
-                If nearest prototype is WRONG class -> Move Away.
-              </div>
-            </div>
-          `,
+                    <p class="mb-4">k-NN doesn't really "learn". It just memorizes data (Lazy Learning).</p>
+                    <p class="mb-4">This is slow and memory heavy. What if we could summarize the data?</p>
+                    <p>Instead of keeping all 10,000 points, let's keep just 10 representative points (<strong>Prototypes</strong>) that behave like the original dataset.</p>
+                `,
+                component: VisualScatterIntro
+            },
+            {
+                id: 'lvq-intro',
+                type: 'concept',
+                title: 'LVQ: The Codebook',
+                content: `
+                    <p class="mb-4"><strong>Learning Vector Quantization (LVQ)</strong> compresses your data.</p>
+                    <p class="mb-4">It finds a set of <strong>Prototypes</strong> (vectors) to represent the classes.</p>
+                    <p class="mb-4">The collection of all prototypes is called a <strong>Codebook</strong>.</p>
+                    <p class="text-sm text-text-muted">Prediction is fast: Just find the single nearest prototype!</p>
+                `,
                 component: VisualLvqUpdate
+            },
+            {
+                id: 'lvq-step-1',
+                type: 'concept',
+                title: 'Step 1: Initialization',
+                content: `
+                    <p class="mb-4"><strong>The Algorithm in Action.</strong></p>
+                    <p class="mb-4">1. We start by picking a few random points from the data to serve as our initial <strong>Prototypes</strong>.</p>
+                    <p class="text-sm text-text-muted">In the visual, imagine the colored dots are our chosen prototypes, ready to learn.</p>
+                `,
+                component: VisualLvqStep,
+                props: { step: 'init' }
+            },
+            {
+                id: 'lvq-step-2',
+                type: 'concept',
+                title: 'Step 2: Pick a Point',
+                content: `
+                    <p class="mb-4">2. We randomly select <strong>one single data point</strong> from our training set.</p>
+                    <p class="mb-4">This point acts as a "teacher". It tells the prototypes: "I am here, and I am Red!"</p>
+                `,
+                component: VisualLvqStep,
+                props: { step: 'pick' }
+            },
+            {
+                id: 'lvq-step-3',
+                type: 'concept',
+                title: 'Step 3: Find Winner',
+                content: `
+                    <p class="mb-4">3. We measure the distance from our data point to ALL prototypes.</p>
+                    <p class="mb-4">The closest prototype is declared the winner or <strong>Best Matching Unit (BMU)</strong>.</p>
+                    <p class="text-sm text-text-muted">Process is similar to k-NN: finding the nearest neighbor.</p>
+                `,
+                component: VisualLvqStep,
+                props: { step: 'find' }
+            },
+            {
+                id: 'lvq-step-4',
+                type: 'concept',
+                title: 'Step 4: Update',
+                content: `
+                    <p class="mb-4">4. We move the BMU.</p>
+                    <div class="grid grid-cols-1 gap-3 text-sm">
+                        <div class="p-3 bg-green-500/10 border border-green-500/20 rounded">
+                            <strong class="text-green-400">Class Matches?</strong>
+                            <br>We <strong>pull</strong> the prototype closer. It should be more like this data point.
+                        </div>
+                        <div class="p-3 bg-red-500/10 border border-red-500/20 rounded">
+                            <strong class="text-red-400">Class Mismatch?</strong>
+                            <br>We <strong>push</strong> the prototype away. It made a mistake!
+                        </div>
+                    </div>
+                `,
+                component: VisualLvqStep,
+                props: { step: 'update' }
+            },
+            {
+                id: 'lvq-step-5',
+                type: 'concept',
+                title: 'Step 5: Repeat',
+                content: `
+                    <p class="mb-4">5. We repeat this for thousands of epochs.</p>
+                    <p class="mb-4">Over time, the prototypes drift to the center of their respective clusters.</p>
+                    <p class="text-sm text-text-muted">We also slowly reduce how much they move (Learning Rate Decay) so they settle down.</p>
+                `,
+                component: VisualLvqStep,
+                props: { step: 'loop' }
+            },
+            {
+                id: 'model-selection',
+                type: 'concept',
+                title: 'Model Selection',
+                content: `
+                    <p class="mb-4">LVQ has more settings (Hyperparameters) than k-NN:</p>
+                    <ul class="list-disc pl-5 space-y-2 text-sm text-text-muted mb-4">
+                        <li>Number of Prototypes (k)</li>
+                        <li>Number of Epochs</li>
+                        <li>Initial Learning Rate</li>
+                    </ul>
+                    <p><strong>Crucial:</strong> Always evaluate on a separate <em>Test Set</em> effectively finding the "Goldilocks" model that isn't underfitting or overfitting.</p>
+                `,
+                component: VisualOverfitting
             },
             {
                 id: 'quiz',
