@@ -17,6 +17,9 @@ import BoxPlotHistogramView from '../experiences/box-plot-histogram/BoxPlotHisto
 import VisualDistribution from '../components/visuals/VisualDistribution.vue'
 import VisualLvqStep from '../components/visuals/VisualLvqStep.vue'
 import VisualCostFunction from '../components/visuals/VisualCostFunction.vue'
+import VisualDataTypes from '../experiences/data-characteristics/VisualDataTypes.vue'
+import VisualFeatureEngineering from '../experiences/data-characteristics/VisualFeatureEngineering.vue'
+import VisualDataQuality from '../experiences/data-characteristics/VisualDataQuality.vue'
 
 
 export const courses = [
@@ -743,6 +746,116 @@ export const courses = [
                                 { id: 'c', text: "On the right side", isCorrect: true }
                             ],
                             explanation: "Skew direction is named after the 'tail' (the long thin part), not the peak. So Skewed Right means the tail extends to the right (positive values)."
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        id: 'data-characteristics',
+        title: 'Data & Characteristics',
+        description: 'Know your data: Types, Quality, and Features.',
+        steps: [
+            {
+                id: 'intro',
+                type: 'concept',
+                title: 'Data: The Fuel of AI',
+                content: `
+                    <p class="text-xl text-white mb-6">"More data beats clever algorithms, but better data beats more data." - Peter Norvig</p>
+                    <p class="mb-4">Before we build models, we must understand what we are feeding them.</p>
+                    <p>Data comes in many shapes and sizes. Knowing the difference between them is the first step of a Data Scientist.</p>
+                `
+            },
+            {
+                id: 'types-playground',
+                type: 'experiment',
+                title: 'Data Types Challenge',
+                content: 'Drag the items to their correct category.',
+                component: VisualDataTypes,
+                props: { isEmbedded: true },
+                layout: 'fullscreen'
+            },
+            {
+                id: 'types-theory',
+                type: 'concept',
+                title: 'Types of Data',
+                content: `
+                    <p class="mb-4">Let's formalize what you just sorted:</p>
+                    <ul class="list-disc pl-5 space-y-2 text-sm text-text-muted">
+                        <li><strong>Nominal</strong>: Names or Labels. No order (e.g., Red, Blue).</li>
+                        <li><strong>Ordinal</strong>: Categories with an order (e.g., Small, Medium, Large).</li>
+                        <li><strong>Discrete</strong>: Counted integers. Steps (e.g., Number of cars).</li>
+                        <li><strong>Continuous</strong>: Measured real numbers. Infinite precision (e.g., Height, Temperature).</li>
+                    </ul>
+                `
+            },
+            {
+                id: 'quality-intro',
+                type: 'concept',
+                title: 'Garbage In, Garbage Out',
+                content: `
+                    <p class="mb-4">Your model is only as good as your data.</p>
+                    <p class="mb-4">If you feed a model noisy, incorrect, or biased data, it will learn... garbage.</p>
+                    <p class="text-sm text-text-muted">Even the most powerful algorithms cannot fix bad data.</p>
+                `
+            },
+            {
+                id: 'quality-playground',
+                type: 'experiment',
+                title: 'Data Quality Lab',
+                content: 'Corrupt the dataset and watch the model fail.',
+                component: VisualDataQuality,
+                props: { isEmbedded: true }
+            },
+            {
+                id: 'feature-engineering',
+                type: 'concept',
+                title: 'Feature Engineering',
+                content: `
+                    <p class="mb-4">Sometimes, raw data is hard to understand.</p>
+                    <p class="mb-4"><strong>Feature Engineering</strong> is the art of transforming data to make it easier for the model to learn.</p>
+                    <p class="mb-4">Example: Transforming coordinates.</p>
+                `,
+                component: VisualFeatureEngineering,
+                layout: 'fullscreen'
+            },
+            {
+                id: 'quiz',
+                type: 'quiz',
+                title: 'Knowledge Check',
+                component: QuizView,
+                props: {
+                    questions: [
+                        {
+                            id: 1,
+                            question: "Which data type is 'Number of Sibilings'?",
+                            options: [
+                                { id: 'a', text: "Continuous", isCorrect: false },
+                                { id: 'b', text: "Discrete", isCorrect: true },
+                                { id: 'c', text: "Nominal", isCorrect: false }
+                            ],
+                            explanation: "You count siblings (1, 2, 3...). You can't have 2.5 siblings effectively."
+                        },
+                        {
+                            id: 2,
+                            question: "What is 'Garbage In, Garbage Out'?",
+                            options: [
+                                { id: 'a', text: "A recycling program", isCorrect: false },
+                                { id: 'b', text: "Bad input data leads to bad output models", isCorrect: true },
+                                { id: 'c', text: "Always clean your code", isCorrect: false }
+                            ],
+                            explanation: "The quality of output is determined by the quality of the input. No algorithm can magically fix fundamental data errors."
+                        },
+                        {
+                            id: 3,
+                            question: "Why do we perform Feature Engineering?",
+                            options: [
+                                { id: 'a', text: "To make the dataset larger", isCorrect: false },
+                                { id: 'b', text: "To make patterns easier for the model to see", isCorrect: true },
+                                { id: 'c', text: "To encrypt the data", isCorrect: false }
+                            ],
+                            explanation: "Feature engineering creates representations of data that better expose the underlying patterns to the learning algorithm."
                         }
                     ]
                 }
