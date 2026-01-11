@@ -17,7 +17,7 @@ const experiences = [
     id: 'linear-regression',
     title: 'Linear Regression',
     subtitle: 'Regression',
-    description: 'Interactive Simpe Linear Regression. Add points and see the best fit line update.',
+    description: 'Master the "Hello World" of ML. Learn about slopes, intercepts, error, and gradients.',
     route: '/linear-regression',
     color: '#ff4444',
     icon: '📈'
@@ -124,6 +124,55 @@ function handleMouseMove(e) {
         </div>
       </div>
     </main>
+
+    <!-- Learning Paths Section -->
+    <section class="max-w-7xl mx-auto px-6 md:px-10 w-full relative z-10 pb-20">
+        <h2 class="text-3xl font-bold text-white mb-8 pl-4 border-l-4 border-primary-500">Learning Paths</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div 
+                class="group relative bg-gradient-to-br from-white/10 to-white/5 border border-white/10 rounded-3xl cursor-pointer transition-all duration-300 hover:-translate-y-2 hover:border-primary-500/50 overflow-hidden"
+                @click="navigateTo('/learn/linear-regression/intro')"
+            >
+                <div class="h-48 bg-black/30 w-full relative overflow-hidden">
+                    <!-- Preview Visual (simplified pattern) -->
+                    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik00MCAwTDAsMHY0MGg0MFowIiBmaWxsPSJub25lIiBzdHJva2U9InJnYmEoMjU1LDI1NSwyNTUsMC4wNSkiIHN0cm9rZS13aWR0aD0iMSIvPgo8L3N2Zz4=')] opacity-50"></div>
+                     <div class="absolute inset-0 flex items-center justify-center">
+                         <span class="text-4xl">📈</span>
+                     </div>
+                </div>
+                
+                <div class="p-8">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="px-2 py-1 rounded text-[10px] uppercase font-bold bg-primary-500/20 text-primary-400 border border-primary-500/20">Course</span>
+                        <span class="text-xs text-text-muted">7 Lessons</span>
+                    </div>
+                    
+                    <h3 class="text-2xl font-bold text-white mb-2">Linear Regression</h3>
+                    <p class="text-sm text-text-muted mb-6">
+                        Start from zero. Understanding the math behind the simplest ML algorithm through interactive visualizations.
+                    </p>
+                    
+                    <div class="flex items-center text-primary-400 text-sm font-bold group-hover:underline">
+                        Start Learning →
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Placeholder for future courses -->
+            <div class="relative bg-white/5 border border-white/5 rounded-3xl p-8 flex flex-col items-center justify-center text-center opacity-50 border-dashed">
+                <div class="text-4xl mb-4 grayscale">🎯</div>
+                <h3 class="text-xl font-bold text-white mb-2">KNN & Classification</h3>
+                <p class="text-xs text-text-muted">Coming soon</p>
+            </div>
+            
+            <div class="relative bg-white/5 border border-white/5 rounded-3xl p-8 flex flex-col items-center justify-center text-center opacity-50 border-dashed">
+                <div class="text-4xl mb-4 grayscale">🏔️</div>
+                <h3 class="text-xl font-bold text-white mb-2">Gradient Descent</h3>
+                <p class="text-xs text-text-muted">Coming soon</p>
+            </div>
+        </div>
+    </section>
 
     <footer class="py-10 text-center text-white/30 text-sm relative z-10 border-t border-white/5">
       <p>Designed for the future of AI education.</p>

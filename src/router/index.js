@@ -15,6 +15,11 @@ const router = createRouter({
       component: HomeView
     },
     {
+      path: '/learn/:courseId/:lessonId',
+      name: 'lesson',
+      component: () => import('../views/LessonView.vue')
+    },
+    {
       path: '/knn-lvq',
       name: 'knn-lvq',
       component: KnnLvqView

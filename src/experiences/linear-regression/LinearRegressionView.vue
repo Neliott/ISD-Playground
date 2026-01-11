@@ -2,90 +2,38 @@
 import { ref, computed } from 'vue'
 import LinearRegressionCanvas from './LinearRegressionCanvas.vue'
 import ExperiencePanel from '../../components/ExperiencePanel.vue'
-import BackToMenu from '../../components/BackToMenu.vue'
+
 import ControlBox from '../../components/controls/ControlBox.vue'
 import Select from '../../components/controls/Select.vue'
 import Button from '../../components/controls/Button.vue'
-import ExplanationOverlay from '../../components/ExplanationOverlay.vue'
-import VisualResiduals from '../../components/visuals/VisualResiduals.vue'
-import VisualGradientDescent from '../../components/visuals/VisualGradientDescent.vue'
-import VisualOverfitting from '../../components/visuals/VisualOverfitting.vue'
-import VisualScatterIntro from '../../components/visuals/VisualScatterIntro.vue'
-import VisualSlopeIntercept from '../../components/visuals/VisualSlopeIntercept.vue'
-import VisualCorrelation from '../../components/visuals/VisualCorrelation.vue'
+import { useRouter } from 'vue-router'
+
+const props = defineProps({
+  isEmbedded: {
+    type: Boolean,
+    default: false
+  }
+})
+
+const router = useRouter()
+
+function goToCourse() {
+    router.push('/learn/linear-regression/intro')
+}
+
+function goToFullScreen() {
+    router.push('/linear-regression')
+}
+
+function goBack() {
+    router.back()
+}
 
 const points = ref([])
 const selectedModel = ref('linear') // 'linear', 'logarithmic', 'exponential', 'power', 'quadratic', 'cubic'
 
-const showExplanation = ref(false)
 
-const explanationSlides = [
-  {
-    title: 'Linear Regression',
-    content: `
-      <p class="text-xl text-white mb-6">Unlocking the Power of Prediction.</p>
-      <p class="mb-4">Linear Regression is the "Hello World" of Machine Learning. It assumes there is a simple underlying trend in your data.</p>
-      <p>By finding this trend, we can predict future values based on past observations.</p>
-    `,
-    component: VisualScatterIntro
-  },
-  {
-    title: 'The Goal: Best Fit',
-    content: `
-      <p class="mb-4">Our objective is to draw a line that passes as close as possible to all data points.</p>
-      <p class="mb-4">But how do we define "close"? With mathematics!</p>
-      <div class="p-4 bg-white/5 border border-white/10 rounded-lg">
-        <code class="text-green-400">y = mx + b</code>
-        <p class="text-xs mt-2 text-text-muted">m = Slope (Trend direction)<br>b = Intercept (Starting value)</p>
-      </div>
-    `,
-    component: VisualSlopeIntercept
-  },
-  {
-    title: 'Visualizing Error (MSE)',
-    content: `
-      <p class="mb-4">To find the best line, we calculate the <strong>Residuals</strong> (red lines).</p>
-      <p class="mb-4">We simplify the problem by calculating the <strong>Mean Squared Error (MSE)</strong>.</p>
-      <p class="text-sm text-text-muted">The animated squares you see represent the error being "squared". Our goal is to make the total area of these red squares as small as possible.</p>
-    `,
-    component: VisualResiduals
-  },
-  {
-    title: 'How It Learns',
-    content: `
-      <p class="mb-4">Imagine a blindfolded hiker trying to find a valley's bottom.</p>
-      <p class="mb-4">This process is called <strong>Gradient Descent</strong>.</p>
-      <ul class="list-disc pl-5 space-y-2 text-sm text-text-muted">
-        <li>The 'Ball' is our model's parameters.</li>
-        <li>The 'Hill' is the total error.</li>
-        <li>We take small steps downhill until we stop moving.</li>
-      </ul>
-    `,
-    component: VisualGradientDescent
-  },
-  {
-    title: 'The Danger of Complexity',
-    content: `
-      <p class="mb-4">More power isn't always better.</p>
-      <p class="mb-4">If we use a complex model (like a high-degree polynomial) on simple data, we risk <strong>Overfitting</strong>.</p>
-      <p class="text-sm text-text-muted">Watch the animation cycle through Underfitting (too simple), Good Fit, and Overfitting (memorizing noise).</p>
-    `,
-    component: VisualOverfitting
-  },
-  {
-    title: 'Correlation Coefficient',
-    content: `
-      <p class="mb-4">How well does X predict Y?</p>
-      <p class="mb-4">The <strong>Pearson Coefficient (r)</strong> gives us a score from -1 to 1.</p>
-      <ul class="list-disc pl-5 space-y-2 text-sm text-text-muted">
-        <li><strong>1</strong>: Perfect positive correlation</li>
-        <li><strong>0</strong>: No correlation (random cloud)</li>
-        <li><strong>-1</strong>: Perfect negative correlation</li>
-      </ul>
-    `,
-    component: VisualCorrelation
-  }
-]
+
 
 const modelDescriptions = {
   linear: 'Finds the best-fitting straight line: y = mx + b',
@@ -431,17 +379,39 @@ const metrics = computed(() => {
         <ExperiencePanel title="Regression" class="h-full md:h-auto">
         <template #header>
           <div class="flex items-center gap-2">
-            <BackToMenu />
-            <div class="flex-1"></div>
             <button 
-              @click="showExplanation = true"
-              class="text-xs text-text-muted hover:text-white underline transition-colors"
+              v-if="!isEmbedded"
+              @click="goBack"
+              class="text-sm text-text-muted hover:text-text transition-colors flex items-center gap-1"
             >
-              How it works?
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+              Back
             </button>
+            <h2 v-else class="text-sm font-bold text-white uppercase tracking-wider">Playground</h2>
+            <div class="flex-1"></div>
           </div>
         </template>
         
+        <div class="mb-4 flex flex-col gap-2">
+            <button 
+              v-if="!isEmbedded"
+              @click="goToCourse"
+              class="w-full py-2 px-3 rounded bg-primary-500/10 border border-primary-500/20 text-primary-400 text-xs font-bold uppercase tracking-wider hover:bg-primary-500/20 transition-colors flex items-center justify-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+              Start Course
+            </button>
+            
+            <button 
+              v-if="isEmbedded"
+              @click="goToFullScreen"
+              class="w-full py-2 px-3 rounded bg-white/5 border border-white/10 text-text-muted text-xs font-bold uppercase tracking-wider hover:bg-white/10 hover:text-white transition-colors flex items-center justify-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path></svg>
+              Full Screen
+            </button>
+        </div>
+
         <div class="mb-4 text-sm text-text-muted">
           Click anywhere to add points.
         </div>
@@ -515,12 +485,5 @@ const metrics = computed(() => {
       </div>
     </div>
 
-    <!-- Explanation Overlay -->
-    <ExplanationOverlay
-      :is-visible="showExplanation"
-      title="Understanding Regression"
-      :slides="explanationSlides"
-      @close="showExplanation = false"
-    />
   </div>
 </template>
