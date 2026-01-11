@@ -23,6 +23,11 @@ import VisualDataQuality from '../experiences/data-characteristics/VisualDataQua
 import VisualKMeans from '../experiences/clustering/VisualKMeans.vue'
 import VisualElbowMethod from '../experiences/clustering/VisualElbowMethod.vue'
 import VisualImageQuantization from '../experiences/clustering/VisualImageQuantization.vue'
+import VisualInteractionTerms from '../components/visuals/VisualInteractionTerms.vue'
+import VisualLvqPhases from '../components/visuals/VisualLvqPhases.vue'
+import VisualConfusionMatrixSmall from '../components/visuals/VisualConfusionMatrixSmall.vue'
+import VisualHierarchical from '../components/visuals/VisualHierarchical.vue'
+import VisualScaling from '../components/visuals/VisualScaling.vue'
 
 
 export const courses = [
@@ -45,13 +50,16 @@ export const courses = [
             {
                 id: 'goal',
                 type: 'concept',
-                title: 'The Goal: Best Fit',
+                title: 'The Goal: Best Fit (OLS)',
                 content: `
-          <p class="mb-4">Our objective is to draw a line that passes as close as possible to all data points.</p>
-          <p class="mb-4">But how do we define "close"? With mathematics!</p>
+          <p class="mb-4">Our objective is to draw a line that passes as close as possible to all data points. This method is called <strong>Ordinary Least Squares (OLS)</strong>.</p>
+          <p class="mb-4">We want to find the coefficients &beta; (Beta):</p>
           <div class="p-4 bg-white/5 border border-white/10 rounded-lg">
-            <code class="text-green-400">y = mx + b</code>
-            <p class="text-xs mt-2 text-text-muted">m = Slope (Trend direction)<br>b = Intercept (Starting value)</p>
+            <code class="text-green-400">y = &beta;<sub>1</sub>x + &beta;<sub>0</sub></code>
+            <p class="text-xs mt-2 text-text-muted">
+              &beta;<sub>1</sub> = Slope (If X increases by 1, Y increases by &beta;<sub>1</sub>)<br>
+              &beta;<sub>0</sub> = Intercept (Value of Y when X is 0)
+            </p>
           </div>
         `,
                 component: VisualSlopeIntercept
@@ -70,9 +78,9 @@ export const courses = [
                 type: 'concept',
                 title: 'Visualizing Error (MSE)',
                 content: `
-          <p class="mb-4">To find the best line, we calculate the <strong>Residuals</strong> (red lines).</p>
-          <p class="mb-4">We simplify the problem by calculating the <strong>Mean Squared Error (MSE)</strong>.</p>
-          <p class="text-sm text-text-muted">The animated squares you see represent the error being "squared". Our goal is to make the total area of these red squares as small as possible.</p>
+          <p class="mb-4">To find the best line, we calculate the <strong>Residuals</strong> (red lines). Note: The sum of residuals is always 0.</p>
+          <p class="mb-4">We simplify the problem by calculating the <strong>Mean Squared Error (RSS/MSE)</strong>.</p>
+          <p class="text-sm text-text-muted">The animated squares you see represent the error being "squared". OLS minimizes this total area.</p>
         `,
                 component: VisualResiduals
             },
@@ -166,6 +174,20 @@ export const courses = [
           <p class="text-sm text-text-muted">Watch the animation cycle through Underfitting (too simple), Good Fit, and Overfitting (memorizing noise).</p>
         `,
                 component: VisualOverfitting
+            },
+            {
+                id: 'interaction-terms',
+                type: 'concept',
+                title: 'Interaction Terms',
+                content: `
+                    <p class="mb-4">What if variables affect each other?</p>
+                    <div class="p-4 bg-white/5 border border-white/10 rounded-lg text-center mb-4">
+                        <code class="text-yellow-400">y = &beta;<sub>0</sub> + &beta;<sub>1</sub>x<sub>1</sub> + &beta;<sub>2</sub>x<sub>2</sub> + &beta;<sub>3</sub>(x<sub>1</sub>x<sub>2</sub>)</code>
+                    </div>
+                    <p class="mb-4">The term <code>x<sub>1</sub>x<sub>2</sub></code> is an <strong>Interaction</strong>.</p>
+                    <p class="text-sm text-text-muted">Example: Salary might depend on Gender AND Education. The effect of Education on Salary might be different for Men and Women.</p>
+                `,
+                component: VisualInteractionTerms
             },
             {
                 id: 'correlation',
@@ -423,12 +445,25 @@ export const courses = [
                 component: VisualLvqUpdate
             },
             {
+                id: 'lvq-phases',
+                type: 'concept',
+                title: 'Phases of LVQ',
+                content: `
+                    <p class="mb-4">LVQ operation has two distinct phases:</p>
+                    <ol class="list-decimal pl-5 space-y-2 mb-4 text-sm text-text-muted">
+                        <li><strong>Training Phase</strong>: Prototypes move around. They get pulled towards matching data and pushed away from mistakes.</li>
+                        <li><strong>Prediction Phase</strong>: Prototypes are fixed. We use <strong>1-NN</strong> (Nearest Prototype) to classify new data.</li>
+                    </ol>
+                `,
+                component: VisualLvqPhases
+            },
+            {
                 id: 'lvq-step-1',
                 type: 'concept',
                 title: 'Step 1: Initialization',
                 content: `
                     <p class="mb-4"><strong>The Algorithm in Action.</strong></p>
-                    <p class="mb-4">1. We start by picking a few random points from the data to serve as our initial <strong>Prototypes</strong>.</p>
+                    <p class="mb-4">1. We start by picking a few random points from the data to serve as our initial <strong>Prototypes</strong> (also called <em>Codebook Vectors</em>).</p>
                     <p class="text-sm text-text-muted">In the visual, imagine the colored dots are our chosen prototypes, ready to learn.</p>
                 `,
                 component: VisualLvqStep,
@@ -519,6 +554,17 @@ export const courses = [
                     <p><strong>Crucial:</strong> Always evaluate on a separate <em>Test Set</em> effectively finding the "Goldilocks" model that isn't underfitting or overfitting.</p>
                 `,
                 component: VisualOverfitting
+            },
+            {
+                id: 'evaluation',
+                type: 'concept',
+                title: 'Evaluating Performance',
+                content: `
+                    <p class="mb-4">How do we know if our prototypes are good?</p>
+                    <p class="mb-4">We use a <strong>Confusion Matrix</strong> on a test set.</p>
+                    <p class="text-sm text-text-muted">It compares the "True Class" (Rows) vs "Predicted Class" (Columns). It reveals False Positives and False Negatives.</p>
+                `,
+                component: VisualConfusionMatrixSmall
             },
             {
                 id: 'methodology',
@@ -867,8 +913,8 @@ export const courses = [
     },
     {
         id: 'unsupervised-learning',
-        title: 'Unsupervised Learning',
-        description: 'Discovering hidden structures in unlabeled data. K-Means and beyond.',
+        title: 'Clustering: K-Means & Hierarchical',
+        description: 'Unsupervised Learning (Series 5). Grouping data without labels.',
         steps: [
             {
                 id: 'intro',
@@ -914,6 +960,37 @@ export const courses = [
                 `,
                 component: VisualElbowMethod,
                 layout: 'fullscreen'
+            },
+            {
+                id: 'hierarchical',
+                type: 'concept',
+                title: 'Hierarchical Clustering',
+                content: `
+                    <p class="mb-4">K-Means requires us to choose K. <strong>Hierarchical Clustering</strong> does not.</p>
+                    <p class="mb-4"><strong>Agglomerative (Bottom-Up)</strong> approach:</p>
+                    <ol class="list-decimal pl-5 space-y-2 mb-4 text-sm text-text-muted">
+                        <li>Start with N clusters (every point is a cluster).</li>
+                        <li>Find the two closest clusters (Distance Matrix).</li>
+                        <li>Merge them.</li>
+                        <li>Repeat until only 1 cluster remains.</li>
+                    </ol>
+                `,
+                component: VisualHierarchical
+            },
+            {
+                id: 'scaling',
+                type: 'concept',
+                title: 'Scaling & Standardization',
+                content: `
+                    <p class="mb-4"><strong>Critical Issue:</strong> Distance calculations are sensitive to scale.</p>
+                    <p class="mb-4">Example: "Socks vs Computers".</p>
+                    <ul class="list-disc pl-5 space-y-2 mb-4 text-sm text-text-muted">
+                        <li>Variable A: 10 pairs of Socks.</li>
+                        <li>Variable B: 1000 Computers.</li>
+                    </ul>
+                    <p>The "Computers" variable will dominate the Euclidean distance. Solution: <strong>Standardize</strong> data (Z-Score) so all variables have Mean=0 and StdDev=1.</p>
+                `,
+                component: VisualScaling
             },
             {
                 id: 'image-quantization',
