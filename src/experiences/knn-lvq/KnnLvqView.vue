@@ -25,6 +25,20 @@ function goBack() {
     router.back()
 }
 
+const points = ref([])
+const prototypes = ref([])
+const k = ref(5)
+const selectedClass = ref(1)
+const showLvq = ref(false)
+const resolveTies = ref(true)
+const prototypesPerClass = ref(3)
+const lvqInitMode = ref('random')
+const distanceMetric = ref('euclidean')
+const distanceWeighting = ref(false)
+const lvqLearningRate = ref(0.05)
+const lvqEpochs = ref(1)
+const lvqK = ref(1)
+
 
 const classes = [
   { id: 1, name: 'Red', color: '#ff4444' },
