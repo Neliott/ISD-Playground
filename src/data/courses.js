@@ -197,10 +197,11 @@ export const courses = [
                 type: 'concept',
                 title: 'Lazy Learning (k-NN)',
                 content: `
-            <p class="text-xl text-white mb-6">Tell me who your neighbors are, and I'll tell you who you are.</p>
-            <p class="mb-4">k-Nearest Neighbors (k-NN) is a simple but powerful algorithm.</p>
-            <p class="mb-4">It doesn't "learn" a model. Instead, it memorizes all training data effectively postponing the decision until you ask for a prediction (Lazy Learning).</p>
-          `
+                    <p class="text-xl text-white mb-6">Tell me who your neighbors are, and I'll tell you who you are.</p>
+                    <p class="mb-4">k-Nearest Neighbors (k-NN) is a simple but powerful algorithm.</p>
+                    <p class="mb-4">It doesn't "learn" a model. Instead, it memorizes all training data - a process known as <strong>Lazy Learning</strong> (or Data-Driven).</p>
+                    <p class="text-xs text-text-muted mt-4">Based on course materials by Stephan Robert & Carlos Pena (HEIG-VD/HES-SO).</p>
+                `
             },
             {
                 id: 'voting',
@@ -228,8 +229,8 @@ export const courses = [
                 content: `
             <p class="mb-4">Distance isn't always a straight line.</p>
             <ul class="list-disc pl-5 space-y-2 mb-4 text-sm text-text-muted">
-              <li><strong>Euclidean (L2)</strong>: The standard straight line (crow flies). Best for physical setups.</li>
-              <li><strong>Manhattan (L1)</strong>: Only horizontal/vertical moves (like a taxi in a grid city).</li>
+              <li><strong>Euclidean (L2)</strong>: The standard straight line.</li>
+              <li><strong>Manhattan (L1)</strong>: Horizontal/vertical moves. <span class="text-green-400">Computationally lighter/faster.</span></li>
             </ul>
             <p class="text-sm">Changing the metric changes which neighbors are "closest"!</p>
           `,
@@ -354,6 +355,22 @@ export const courses = [
                 props: { step: 'loop' }
             },
             {
+                id: 'lvq-implementation',
+                type: 'concept',
+                title: 'Python Implementation Structure',
+                content: `
+                    <p class="mb-4">To implement this, you need 4 key functions:</p>
+                    <ul class="list-disc pl-5 space-y-2 text-sm text-text-muted">
+                        <li><code>dist_euclidean(a, b)</code>: Calculates distance.</li>
+                        <li><code>get_best_matching_unit(codebook, test_point)</code>: Finds the nearest prototype.</li>
+                        <li><code>init_codevector(train_data)</code>: Randomly picks initial prototypes.</li>
+                        <li><code>train_codebook(train_data, epochs, rate)</code>: The main loop (Epochs -> Shuffle -> Update).</li>
+                    </ul>
+                `,
+                component: VisualLvqStep,
+                props: { step: 'init' }
+            },
+            {
                 id: 'model-selection',
                 type: 'concept',
                 title: 'Model Selection',
@@ -369,6 +386,21 @@ export const courses = [
                 component: VisualOverfitting
             },
             {
+                id: 'methodology',
+                type: 'concept',
+                title: 'Standard Methodology',
+                content: `
+                    <p class="mb-4">The standard workflow for training LVQ:</p>
+                    <ol class="list-decimal pl-5 space-y-2 text-sm text-text-muted">
+                        <li><strong>Database</strong>: Your raw data.</li>
+                        <li><strong>Train/Test Split</strong>: Separate data to avoid cheating.</li>
+                        <li><strong>Model Selection</strong>: Try different K, Epochs, Rates.</li>
+                        <li><strong>Evaluation</strong>: Measure accuracy on the Test set.</li>
+                    </ol>
+                `,
+                component: VisualOverfitting
+            },
+            {
                 id: 'quiz',
                 type: 'quiz',
                 title: 'Knowledge Check',
@@ -377,33 +409,73 @@ export const courses = [
                     questions: [
                         {
                             id: 1,
-                            question: "How does k-NN classify a new point?",
+                            question: "In Weighted k-NN, how is the weight of a neighbor calculated?",
                             options: [
-                                { id: 'a', text: "It builds a decision tree", isCorrect: false },
-                                { id: 'b', text: "It asks the nearest neighbors to vote", isCorrect: true },
-                                { id: 'c', text: "It calculates the average of all points", isCorrect: false }
+                                { id: 'a', text: "Weight = Distance (Further is stronger)", isCorrect: false },
+                                { id: 'b', text: "Weight = 1 / Distance (Closer is stronger)", isCorrect: true },
+                                { id: 'c', text: "Weight is always 1 for everyone", isCorrect: false }
                             ],
-                            explanation: "k-NN looks at the 'k' closest data points and assigns the most common class among them to the new point."
+                            explanation: "Weighted k-NN assigns more importance to closer neighbors. The weight is inversely proportional to the distance."
                         },
                         {
                             id: 2,
-                            question: "What happens if 'k' is too small (e.g., k=1)?",
+                            question: "Why might you choose Manhattan Distance (L1) over Euclidean (L2)?",
                             options: [
-                                { id: 'a', text: "The model becomes too simple (Underfitting)", isCorrect: false },
-                                { id: 'b', text: "The model captures noise and outliers (Overfitting)", isCorrect: true },
-                                { id: 'c', text: "The model becomes very slow", isCorrect: false }
+                                { id: 'a', text: "It is computationally lighter and faster to calculate", isCorrect: true },
+                                { id: 'b', text: "It always gives better accuracy", isCorrect: false },
+                                { id: 'c', text: "It is the only distance metric that works in 3D", isCorrect: false }
                             ],
-                            explanation: "A small 'k' makes the decision boundary very jagged and sensitive to noise, leading to high variance (overfitting)."
+                            explanation: "Manhattan distance involves simple addition/subtraction, avoiding the square roots and squares of Euclidean distance, making it faster."
                         },
                         {
                             id: 3,
-                            question: "How does LVQ differ from k-NN?",
+                            question: "What is the main structural advantage of LVQ over k-NN?",
                             options: [
-                                { id: 'a', text: "LVQ uses prototypes instead of all data points", isCorrect: true },
-                                { id: 'b', text: "LVQ is a regression algorithm", isCorrect: false },
-                                { id: 'c', text: "LVQ requires no training", isCorrect: false }
+                                { id: 'a', text: "LVQ stores all data points (Lazy Learning)", isCorrect: false },
+                                { id: 'b', text: "LVQ compresses data into a small set of Prototypes (Codebook)", isCorrect: true },
+                                { id: 'c', text: "LVQ does not require any hyperparameters", isCorrect: false }
                             ],
-                            explanation: "LVQ learns a set of prototypes to represent the classes, making prediction much faster than k-NN which needs all training data."
+                            explanation: "k-NN must remember the entire dataset. LVQ approximates the dataset with a few prototypes, making prediction much faster and memory-efficient."
+                        },
+                        {
+                            id: 4,
+                            question: "In the LVQ training loop, what is the 'Best Matching Unit' (BMU)?",
+                            options: [
+                                { id: 'a', text: "The average of all data points", isCorrect: false },
+                                { id: 'b', text: "The prototype that is closest to the current training point", isCorrect: true },
+                                { id: 'c', text: "The prototype that is furthest away", isCorrect: false }
+                            ],
+                            explanation: "The BMU is the single prototype that 'wins' the competition for the current data point by being the nearest."
+                        },
+                        {
+                            id: 5,
+                            question: "If the BMU's class MATCHES the training point's class, what happens?",
+                            options: [
+                                { id: 'a', text: "The prototype is pushed away (Repulsion)", isCorrect: false },
+                                { id: 'b', text: "The prototype is pulled closer (Attraction)", isCorrect: true },
+                                { id: 'c', text: "Nothing happens", isCorrect: false }
+                            ],
+                            explanation: "If the prototype correctly identified the class, we reward it by moving it closer to that data point to reinforce the behavior."
+                        },
+                        {
+                            id: 6,
+                            question: "If the BMU's class is DIFFERENT from the training point's class, what happens?",
+                            options: [
+                                { id: 'a', text: "The prototype is pushed away (Repulsion)", isCorrect: true },
+                                { id: 'b', text: "The prototype is pulled closer (Attraction)", isCorrect: false },
+                                { id: 'c', text: "The prototype is deleted", isCorrect: false }
+                            ],
+                            explanation: "If the prototype made a mistake (wrong class), we push it away so it's less likely to claim this region of space in the future."
+                        },
+                        {
+                            id: 7,
+                            question: "Which of the following is NOT a hyperparameter of LVQ?",
+                            options: [
+                                { id: 'a', text: "Number of Prototypes", isCorrect: false },
+                                { id: 'b', text: "Learning Rate", isCorrect: false },
+                                { id: 'c', text: "Values of the raw data", isCorrect: true }
+                            ],
+                            explanation: "The values of the data are the input itself. Hyperparameters are settings we choose: number of prototypes, learning rate, and number of epochs."
                         }
                     ]
                 }
