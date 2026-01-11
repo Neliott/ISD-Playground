@@ -28,6 +28,8 @@ import VisualLvqPhases from '../components/visuals/VisualLvqPhases.vue'
 import VisualConfusionMatrixSmall from '../components/visuals/VisualConfusionMatrixSmall.vue'
 import VisualHierarchical from '../components/visuals/VisualHierarchical.vue'
 import VisualScaling from '../components/visuals/VisualScaling.vue'
+import VisualHyperparameters from '../components/visuals/VisualHyperparameters.vue'
+import VisualLeastSquaresMath from '../components/visuals/VisualLeastSquaresMath.vue'
 
 
 export const courses = [
@@ -63,6 +65,23 @@ export const courses = [
           </div>
         `,
                 component: VisualSlopeIntercept
+            },
+            {
+                id: 'direct-solution',
+                type: 'concept',
+                title: 'Direct Solution (Closed Form)',
+                content: `
+                    <div class="mb-4 text-sm font-mono bg-white/5 p-3 rounded">
+                        <p>β = Sxy / Sxx</p>
+                        <p class="text-xs text-text-muted mt-2">
+                            Sxy = Σ(x - x̄)(y - ȳ)<br>
+                            Sxx = Σ(x - x̄)²
+                        </p>
+                    </div>
+                    <p class="text-sm italic">α = ȳ - βx̄</p>
+                `,
+                component: VisualLeastSquaresMath,
+                layout: 'fullscreen'
             },
             {
                 id: 'playground',
@@ -545,15 +564,15 @@ export const courses = [
                 type: 'concept',
                 title: 'Model Selection',
                 content: `
-                    <p class="mb-4">LVQ has more settings (Hyperparameters) than k-NN:</p>
                     <ul class="list-disc pl-5 space-y-2 text-sm text-text-muted mb-4">
                         <li>Number of Prototypes (k)</li>
                         <li>Number of Epochs</li>
                         <li>Initial Learning Rate</li>
                     </ul>
-                    <p><strong>Crucial:</strong> Always evaluate on a separate <em>Test Set</em> effectively finding the "Goldilocks" model that isn't underfitting or overfitting.</p>
+                    <p class="mb-4">We must iterate over multiple models by varying these <strong>Hyper-parameters</strong>.</p>
+                    <p class="text-sm"><strong>Crucial:</strong> Evaluation must be done on a separate dataset (e.g., Hold-out Validation) to avoid cheating.</p>
                 `,
-                component: VisualOverfitting
+                component: VisualHyperparameters
             },
             {
                 id: 'evaluation',
