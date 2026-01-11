@@ -1,5 +1,7 @@
 <script setup>
 import { onMounted, ref, watch, onUnmounted } from 'vue'
+import ThreeScene from './ThreeScene.vue'
+import * as THREE from 'three'
 
 const props = defineProps({
   step: {
@@ -8,138 +10,212 @@ const props = defineProps({
   }
 })
 
-const canvas = ref(null)
+const canvasLeft = ref(null)
 let animationId = null
 
-onMounted(() => {
-  const ctx = canvas.value.getContext('2d')
-  let rot = 0
+// Fixed Data Points (normalized 0-1)
+const dataPoints = [
+    { x: 0.1, y: 0.2 },
+    { x: 0.3, y: 0.4 },
+    { x: 0.5, y: 0.45 },
+    { x: 0.7, y: 0.8 },
+    { x: 0.9, y: 0.85 }
+]
 
-  const draw = () => {
-    if (!canvas.value) return
-    const w = canvas.value.width = canvas.value.offsetWidth
-    const h = canvas.value.height = canvas.value.offsetHeight
-    const cx = w / 2
-    const cy = h / 2
+const optimalM = 0.8
+const optimalB = 0.15
 
-    // Simple 3D projection
-    // Z = Cost, X = m, Y = b
-    const project = (x, y, z) => {
-      const scale = 200
-      // Rotate around Y axis
-      const rx = x * Math.cos(rot) - z * Math.sin(rot)
-      const rz = x * Math.sin(rot) + z * Math.cos(rot)
-      
-      // Iso-ish projection
-      const px = cx + (rx - y) * Math.cos(30 * Math.PI/180) * 0.7 * scale
-      const py = cy + (rx + y) * Math.sin(30 * Math.PI/180) * 0.7 * scale - (z * scale * 0.5)
-      return { x: px, y: py, depth: rz }
-    }
+// State shared between 2D and 3D
+const currentM = ref(0.2)
+const currentB = ref(0.8)
 
-    // Cost Function Surface J(m, b) = m^2 + b^2 (Paraboloid)
-    const cost = (m, b) => (m*m + b*b) * 0.5
-
+// 2D Drawing Logic (Left Panel)
+const drawLineGraph = (ctx, w, h, m, b) => {
     ctx.clearRect(0, 0, w, h)
     
-    // Draw Grid (The "Bowl")
-    const steps = 15
-    const range = 1.2
-    
-    // Draw lines along X (m)
+    // Grid
+    ctx.strokeStyle = '#334155'
     ctx.lineWidth = 1
+    ctx.beginPath()
+    for(let i=0.1; i<1; i+=0.2) {
+        ctx.moveTo(i*w, 0); ctx.lineTo(i*w, h)
+        ctx.moveTo(0, i*h); ctx.lineTo(w, i*h)
+    }
+    ctx.stroke()
     
-    const drawLine = (p1, p2, color) => {
+    const mapX = (v) => v * w
+    const mapY = (v) => h - (v * h)
+    
+    // Points
+    dataPoints.forEach(p => {
+        ctx.fillStyle = '#f8fafc'
         ctx.beginPath()
-        ctx.moveTo(p1.x, p1.y)
-        ctx.lineTo(p2.x, p2.y)
-        ctx.strokeStyle = color
-        ctx.stroke()
-    }
-
-    // Grid points
-    const points = []
-    for(let i = -steps; i <= steps; i++) {
-        for(let j = -steps; j <= steps; j++) {
-            const m = (i / steps) * range
-            const b = (j / steps) * range
-            const z = cost(m, b)
-            points.push({ m, b, z, proj: project(m, b, z) })
-        }
-    }
-
-    // Connect them
-    // Simple wireframe drawing
-    points.forEach((p, index) => {
-        // Line to right
-        if (index % (2 * steps + 1) !== 2 * steps) {
-           const right = points[index + 1]
-           // Depth check for simplified opacity (fog)
-           const alpha = (p.proj.depth + 2) / 4
-           drawLine(p.proj, right.proj, `rgba(255, 255, 255, ${Math.max(0.1, alpha * 0.3)})`)
-        }
-        // Line to bottom
-        if (index + (2 * steps + 1) < points.length) {
-            const bottom = points[index + (2 * steps + 1)]
-             const alpha = (p.proj.depth + 2) / 4
-            drawLine(p.proj, bottom.proj, `rgba(255, 255, 255, ${Math.max(0.1, alpha * 0.3)})`)
-        }
-    })
-
-    // Draw Minimum
-    if (props.step === 'min' || props.step === 'gradient') {
-        const center = project(0, 0, 0)
-        ctx.fillStyle = '#4ade80'
-        ctx.shadowColor = '#4ade80'
-        ctx.shadowBlur = 10
-        ctx.beginPath()
-        ctx.arc(center.x, center.y, 6, 0, Math.PI * 2)
+        ctx.arc(mapX(p.x), mapY(p.y), 4, 0, Math.PI*2)
         ctx.fill()
-        ctx.shadowBlur = 0
-        ctx.fillStyle = '#fff'
-        ctx.fillText('Minimum (Global Optima)', center.x + 10, center.y)
+    })
+    
+    // Line
+    ctx.strokeStyle = '#facc15'
+    ctx.lineWidth = 3
+    ctx.beginPath()
+    const x1 = 0; const y1 = m*x1 + b
+    const x2 = 1; const y2 = m*x2 + b
+    ctx.moveTo(mapX(x1), mapY(y1))
+    ctx.lineTo(mapX(x2), mapY(y2))
+    ctx.stroke()
+    
+    // Residuals
+    ctx.lineWidth = 1
+    ctx.strokeStyle = '#ef4444'
+    ctx.setLineDash([2, 2])
+    dataPoints.forEach(p => {
+        const predY = m*p.x + b
+        ctx.beginPath()
+        ctx.moveTo(mapX(p.x), mapY(p.y))
+        ctx.lineTo(mapX(p.x), mapY(predY))
+        ctx.stroke()
+    })
+    ctx.setLineDash([])
+}
+
+// 3D Logic (Right Panel)
+let ballMesh, surfaceMesh
+const scale = 2
+
+const getCost = (m, b) => {
+    return 1.5 * ((m - optimalM)**2 + (b - optimalB)**2)
+}
+
+const initThree = ({ scene }) => {
+    // 1. Create Cost Surface
+    const geometry = new THREE.PlaneGeometry(4, 4, 32, 32)
+    const count = geometry.attributes.position.count
+    
+    for (let i = 0; i < count; i++) {
+        const x = geometry.attributes.position.getX(i) // represents (m - optimalM)
+        const y = geometry.attributes.position.getY(i) // represents (b - optimalB)
+        
+        // Z is cost (height)
+        // We map plane X,Y to our M,B space deviation
+        // Plane is centered at 0,0. 
+        // Let's say range is -2 to 2.
+        
+        const mDev = x * 0.5 
+        const bDev = y * 0.5
+        const cost = 1.5 * (mDev**2 + bDev**2)
+        
+        geometry.attributes.position.setZ(i, cost)
+    }
+    
+    geometry.computeVertexNormals()
+    
+    const material = new THREE.MeshPhongMaterial({ 
+        color: 0x3b82f6, 
+        wireframe: true,
+        side: THREE.DoubleSide
+    })
+    surfaceMesh = new THREE.Mesh(geometry, material)
+    surfaceMesh.rotation.x = -Math.PI / 2 // Flat on ground initially
+    // Actually typically surfaces are XZ plane in Three.js, but PlaneGeometry is XY.
+    // Let's keep it XY for "Wall" view or rotate to lie down.
+    // Standard 3D plot: Z is up (Cost). X and Y are parameters.
+    // Plan: Rotate -90 deg X so 'Z' of geometry points UP in world Y.
+    surfaceMesh.rotation.x = -Math.PI / 2 
+    
+    scene.add(surfaceMesh)
+
+    // 2. Ball (Current State)
+    const ballGeo = new THREE.SphereGeometry(0.1, 16, 16)
+    const ballMat = new THREE.MeshPhongMaterial({ color: 0xfacc15 })
+    ballMesh = new THREE.Mesh(ballGeo, ballMat)
+    scene.add(ballMesh)
+    
+    // Add grid helper
+    const grid = new THREE.GridHelper(10, 10, 0x334155, 0x1e293b)
+    scene.add(grid)
+}
+
+const updateThree = ({ scene }) => {
+    if (!ballMesh) return
+
+    // Update Ball Position based on currentM, currentB
+    // We need to map M,B back to the Plane Geometry coordinates
+    // Geometry X = (m - optimalM) / 0.5
+    // Geometry Y = (b - optimalB) / 0.5
+    // But we rotated the mesh. 
+    // Mesh X acts as World X.
+    // Mesh Y acts as World Z (depth).
+    // Mesh Z (height) acts as World Y (up).
+    
+    const mDev = currentM.value - optimalM
+    const bDev = currentB.value - optimalB
+    
+    const worldX = mDev / 0.5
+    const worldZ = - (bDev / 0.5) // Y in geometry became -Z in world due to rotation? Let's check visually.
+    // Actually PlaneGeometry Y goes UP. Rotation -90 deg X makes +Y point to -Z.
+    
+    const cost = getCost(currentM.value, currentB.value)
+    
+    ballMesh.position.set(worldX, cost, - (bDev / 0.5)) 
+}
+
+onMounted(() => {
+  const ctx = canvasLeft.value.getContext('2d')
+  let startTime = Date.now()
+
+  const loop = () => {
+    if (!canvasLeft.value) return 
+    const w = canvasLeft.value.width = canvasLeft.value.offsetWidth
+    const h = canvasLeft.value.height = canvasLeft.value.offsetHeight
+    
+    // Animation Logic
+    const time = (Date.now() - startTime) / 1000
+    
+    if (props.step === 'surface') {
+        currentM.value = 0.2
+        currentB.value = 0.8
+    } else if (props.step === 'gradient') {
+        const t = (Math.sin(time * 2) + 1) / 2
+        // Simple Lerp
+        const startM = 0.2; const startB = 0.8
+        currentM.value = startM + (optimalM - startM) * t
+        currentB.value = startB + (optimalB - startB) * t
+    } else if (props.step === 'min') {
+        currentM.value = optimalM
+        currentB.value = optimalB
     }
 
-    // Animate "Ball" rolling down
-    if (props.step === 'gradient') {
-       const time = Date.now() / 1000
-       const loopT = time % 2
-       
-       // Starting point (High cost)
-       const startM = 1
-       const startB = 1
-       
-       // Lerp to 0,0
-       const currM = startM * (1 - loopT/2)
-       const currB = startB * (1 - loopT/2)
-       const currZ = cost(currM, currB)
-       
-       const ball = project(currM, currB, currZ)
-       
-       ctx.fillStyle = '#facc15'
-       ctx.shadowColor = '#facc15'
-       ctx.shadowBlur = 15
-       ctx.beginPath()
-       ctx.arc(ball.x, ball.y, 8, 0, Math.PI * 2)
-       ctx.fill()
-       ctx.shadowBlur = 0
-    }
-
-    rot += 0.005
-    animationId = requestAnimationFrame(draw)
+    drawLineGraph(ctx, w, h, currentM.value, currentB.value)
+    
+    animationId = requestAnimationFrame(loop)
   }
-  
-  draw()
+  loop()
 })
 
 onUnmounted(() => cancelAnimationFrame(animationId))
 </script>
 
 <template>
-  <div class="relative w-full h-full bg-slate-900 rounded-lg overflow-hidden border border-slate-700">
-    <canvas ref="canvas" class="block w-full h-full"></canvas>
-    <div class="absolute bottom-4 left-4 bg-black/50 p-2 rounded text-xs text-white backdrop-blur">
-        <p>J(m, b) Cost Surface</p>
-        <p class="text-text-muted">Vertical axis = Error Magnitude</p>
-    </div>
+  <div class="w-full h-full flex flex-row bg-slate-900 rounded-lg overflow-hidden border border-slate-700">
+      <!-- LEFT: Data Space -->
+      <div class="w-1/2 h-full relative border-r border-slate-700">
+          <canvas ref="canvasLeft" class="w-full h-full block"></canvas>
+          <div class="absolute top-2 left-2 bg-black/40 p-1 px-2 rounded text-xs text-white">
+              Data Space (Line Fitting)
+          </div>
+      </div>
+      
+      <!-- RIGHT: Parameter Space (Three.js) -->
+      <div class="w-1/2 h-full relative">
+           <ThreeScene 
+                :cameraPosition="{ x: 3, y: 4, z: 4 }"
+                @init="initThree"
+                @tick="updateThree"
+           />
+           <div class="absolute bottom-2 right-2 bg-black/40 p-1 px-2 rounded text-xs text-white text-right pointer-events-none">
+              Parameter Space (3D)<br>
+              <span class="text-text-muted">Drag to Rotate • Scroll to Zoom</span>
+          </div>
+      </div>
   </div>
 </template>

@@ -133,7 +133,7 @@ export const courses = [
                 props: { step: 'min' }
             },
             {
-                id: 'gd-learning-rate',
+                id: 'gd-math-details',
                 type: 'concept',
                 title: 'Gradient Descent: The Math',
                 content: `
